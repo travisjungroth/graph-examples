@@ -244,6 +244,14 @@ class CircularLinkedList(AbstractLinkedList):
             yield node.value
             node = node.next
 
+    def infinite_iterator(self):
+        if self.tail is None:
+            return
+        node = self.head
+        while True:
+            yield node.value
+            node = node.next
+
     def __contains__(self, value: object) -> bool:
         if self.tail is None:
             return False
