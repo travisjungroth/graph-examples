@@ -17,6 +17,9 @@ class AbstractLinkedList(ABC, Collection):
     def __init__(self, values: Iterable = ()):
         pass
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}({repr([x for x in self])})'
+
     @abstractmethod
     def appendleft(self, value):
         pass
@@ -77,3 +80,4 @@ class LinkedList(AbstractLinkedList):
         last_node = None
         while node is not None:
             node.next, last_node, node = last_node, node, node.next
+        self.head = last_node
