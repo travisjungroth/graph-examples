@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Collection, Iterable, Iterator, Optional
 
@@ -8,15 +9,15 @@ class AbstractLinkedNode(ABC, Collection):
 
     @classmethod
     @abstractmethod
-    def from_iterable(cls, values: Iterable) -> Optional['AbstractLinkedNode']:
+    def from_iterable(cls, values: Iterable) -> Optional[AbstractLinkedNode]:
         pass
 
     @abstractmethod
-    def appendleft(self, value) -> 'AbstractLinkedNode':
+    def appendleft(self, value) -> AbstractLinkedNode:
         pass
 
     @abstractmethod
-    def popleft(self) -> tuple['AbstractLinkedNode', object]:
+    def popleft(self) -> tuple[AbstractLinkedNode, object]:
         pass
 
     @abstractmethod
@@ -30,7 +31,7 @@ class LinkedNode(AbstractLinkedNode):
         self.next = next_
 
     @classmethod
-    def from_iterable(cls, values: Iterable) -> Optional['LinkedNode']:
+    def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
         values_iter = iter(values)
         try:
             head = LinkedNode(next(values_iter))
@@ -60,15 +61,15 @@ class LinkedNode(AbstractLinkedNode):
             return True
         return self.next is not None and value in self.next
 
-    def appendleft(self, value) -> 'LinkedNode':
+    def appendleft(self, value) -> LinkedNode:
         return LinkedNode(value, self)
 
-    def popleft(self) -> tuple['LinkedNode', object]:
+    def popleft(self) -> tuple[LinkedNode, object]:
         head = self.next
         self.next = None
         return head, self.value
 
-    def reverse(self, last_node: Optional['LinkedNode'] = None):
+    def reverse(self, last_node: Optional[LinkedNode] = None):
         next_node = self.next
         self.next = last_node
         if next_node is None:
