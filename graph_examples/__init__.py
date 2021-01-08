@@ -42,14 +42,11 @@ class LinkedNode(AbstractLinkedNode):
     def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
         values_iter = iter(values)
         try:
-            head = cls(next(values_iter))
+            node = cls(next(values_iter))
         except StopIteration:
             return None
-        node = head
-        for value in values_iter:
-            node.next = cls(value)
-            node = node.next
-        return head
+        node.next = cls.from_iterable(values_iter)
+        return node
 
     def __len__(self) -> int:
         if self.next is None:
@@ -82,23 +79,21 @@ class LinkedNode(AbstractLinkedNode):
         return next_node.reverse(self)
 
 
-class CircularLinkedNode(AbstractLinkedNode):
+class CircularLinkedNode():
     def __init__(self, value, next_: Optional[CircularLinkedNode] = None):
         self.value = value
         self.next = next_ if next_ is not None else self
 
     @classmethod
-    def from_iterable(cls, values: Iterable) -> Optional[CircularLinkedNode]:
+    def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularLinkedNode]:
         values_iter = iter(values)
         try:
-            head = cls(next(values_iter))
+            node = cls(next(values_iter), head)
+            if last_node is not None:
+                last_node.next = node
+            return cls.from_iterable(values_iter, node if head is None else head, node)
         except StopIteration:
-            return None
-        node = head
-        for value in values_iter:
-            node.next = cls(value, head)
-            node = node.next
-        return node
+            return last_node
 
     def __len__(self, tail: Optional[CircularLinkedNode] = None) -> int:
         if self is tail:
@@ -158,7 +153,6 @@ class LinkedList(AbstractLinkedList):
             self.head = LinkedNode(next(values_iter))
         except StopIteration:
             self.head = None
-            return
         node = self.head
         for value in values_iter:
             node.next = LinkedNode(value)
@@ -208,8 +202,7 @@ class CircularLinkedList(AbstractLinkedList):
         try:
             head = CircularLinkedNode(next(values_iter))
         except StopIteration:
-            self.tail = None
-            return
+            head = None
         node = head
         for value in values_iter:
             node.next = CircularLinkedNode(value, head)
@@ -286,4 +279,3 @@ class CircularLinkedList(AbstractLinkedList):
         while node is not self.tail:
             node.next, last_node, node = last_node, node, node.next
         self.tail.next, self.tail = last_node, self.head
-
