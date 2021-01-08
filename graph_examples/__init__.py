@@ -7,6 +7,14 @@ class AbstractLinkedNode(ABC, Collection):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}.from_iterable({repr([x for x in self])})'
 
+    @abstractmethod
+    def __iter__(self) -> Iterator:
+        pass
+
+    @abstractmethod
+    def __contains__(self, value) -> bool:
+        pass
+
     @classmethod
     @abstractmethod
     def from_iterable(cls, values: Iterable) -> Optional[AbstractLinkedNode]:
@@ -77,7 +85,7 @@ class LinkedNode(AbstractLinkedNode):
 class CircularLinkedNode(AbstractLinkedNode):
     def __init__(self, value, next_: Optional[CircularLinkedNode] = None):
         self.value = value
-        self.next = next_
+        self.next = next_ if next_ is not None else self
 
     @classmethod
     def from_iterable(cls, values: Iterable) -> Optional[CircularLinkedNode]:
@@ -88,9 +96,8 @@ class CircularLinkedNode(AbstractLinkedNode):
             return None
         node = head
         for value in values_iter:
-            node.next = cls(value)
+            node.next = cls(value, head)
             node = node.next
-        node.next = head
         return node
 
     def __len__(self, tail: Optional[CircularLinkedNode] = None) -> int:
@@ -151,11 +158,11 @@ class LinkedList(AbstractLinkedList):
             self.head = LinkedNode(next(values_iter))
         except StopIteration:
             self.head = None
-        else:
-            node = self.head
-            for value in values_iter:
-                node.next = LinkedNode(value)
-                node = node.next
+            return
+        node = self.head
+        for value in values_iter:
+            node.next = LinkedNode(value)
+            node = node.next
 
     def __len__(self) -> int:
         length = 0
@@ -193,3 +200,82 @@ class LinkedList(AbstractLinkedList):
         while node is not None:
             node.next, last_node, node = last_node, node, node.next
         self.head = last_node
+
+
+class CircularLinkedList(AbstractLinkedList):
+    def __init__(self, values: Iterable = ()):
+        values_iter = iter(values)
+        try:
+            head = CircularLinkedNode(next(values_iter))
+        except StopIteration:
+            self.tail = None
+            return
+        node = head
+        for value in values_iter:
+            node.next = CircularLinkedNode(value, head)
+            node = node.next
+        self.tail = node
+
+    @property
+    def head(self) -> CircularLinkedNode:
+        return self.tail.next
+
+    @head.setter
+    def head(self, node: CircularLinkedNode):
+        self.tail.next = node
+
+    def __len__(self) -> int:
+        if self.tail is None:
+            return 0
+        length = 1
+        node = self.head
+        while node is not self.tail:
+            length += 1
+            node = node.next
+        return length
+
+    def __iter__(self) -> Iterator:
+        if self.tail is None:
+            return
+        head = self.head
+        yield head.value
+        node = head.next
+        while node is not head:
+            yield node.value
+            node = node.next
+
+    def __contains__(self, value: object) -> bool:
+        if self.tail is None:
+            return False
+        node = self.head
+        while node is not self.tail:
+            if node.value == value:
+                return True
+            node = node.next
+        return self.tail.value == value
+
+    def appendleft(self, value):
+        if self.tail is None:
+            self.tail = CircularLinkedNode(value)
+        else:
+            self.head = CircularLinkedNode(value, self.head)
+
+    def popleft(self):
+        if self.tail is None:
+            raise IndexError
+        value = self.head.value
+        if self.tail is self.head:
+            self.tail = None
+        else:
+            self.head = self.head.next
+        return value
+
+    def reverse(self):
+        if self.tail is None:
+            return
+        node = self.head
+        last_node = self.tail
+        while node is not self.tail:
+            node.next, last_node, node = last_node, node, node.next
+        self.tail.next, self.tail = last_node, self.head
+
