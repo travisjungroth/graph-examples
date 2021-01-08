@@ -26,7 +26,7 @@ class AbstractLinkedNode(ABC, Collection):
 
 
 class LinkedNode(AbstractLinkedNode):
-    def __init__(self, value, next_: Optional[AbstractLinkedNode] = None):
+    def __init__(self, value, next_: Optional[LinkedNode] = None):
         self.value = value
         self.next = next_
 
@@ -34,22 +34,19 @@ class LinkedNode(AbstractLinkedNode):
     def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
         values_iter = iter(values)
         try:
-            head = LinkedNode(next(values_iter))
+            head = cls(next(values_iter))
         except StopIteration:
             return None
         node = head
         for value in values_iter:
-            node.next = LinkedNode(value)
+            node.next = cls(value)
             node = node.next
         return head
 
     def __len__(self) -> int:
-        length = 0
-        node = self
-        while node is not None:
-            length += 1
-            node = node.next
-        return length
+        if self.next is None:
+            return 1
+        return 1 + len(self.next)
 
     def __iter__(self) -> Iterator:
         yield self.value
@@ -75,6 +72,54 @@ class LinkedNode(AbstractLinkedNode):
         if next_node is None:
             return self
         return next_node.reverse(self)
+
+
+class CircularLinkedNode(AbstractLinkedNode):
+    def __init__(self, value, next_: Optional[CircularLinkedNode] = None):
+        self.value = value
+        self.next = next_
+
+    @classmethod
+    def from_iterable(cls, values: Iterable) -> Optional[CircularLinkedNode]:
+        values_iter = iter(values)
+        try:
+            head = cls(next(values_iter))
+        except StopIteration:
+            return None
+        node = head
+        for value in values_iter:
+            node.next = cls(value)
+            node = node.next
+        node.next = head
+        return node
+
+    def __len__(self, tail: Optional[CircularLinkedNode] = None) -> int:
+        if self is tail:
+            return 0
+        return 1 + self.next.__len__(self if tail is None else tail)
+
+    def __iter__(self, tail: Optional[CircularLinkedNode] = None) -> Iterator:
+        if self is tail:
+            return
+        yield self.next.value
+        yield from self.next.__iter__(self if tail is None else tail)
+
+    def __contains__(self, value, tail: Optional[CircularLinkedNode] = None) -> bool:
+        if self is tail:
+            return False
+        return value == self.value or self.next.__contains__(value, self if tail is None else tail)
+
+    def appendleft(self, value) -> CircularLinkedNode:
+        self.next = CircularLinkedNode(value, self.next)
+        return self.next
+
+    def popleft(self) -> tuple[CircularLinkedNode, object]:
+        value = self.next.value
+        self.next = self.next.next if self.next is not self else None
+        return self.next, value
+
+    def reverse(self):
+        pass
 
 
 class AbstractLinkedList(ABC, Collection):
