@@ -79,7 +79,7 @@ class LinkedNode(AbstractLinkedNode):
         return next_node.reverse(self)
 
 
-class CircularLinkedNode():
+class CircularLinkedNode(AbstractLinkedNode):
     def __init__(self, value, next_: Optional[CircularLinkedNode] = None):
         self.value = value
         self.next = next_ if next_ is not None else self
