@@ -154,8 +154,12 @@ class CircularLinkedNode(AbstractLinkedNode):
         self.next = self.next.next if self.next is not self else None
         return self.next, value
 
-    def reverse(self):
-        pass
+    def reverse(self, last_node: Optional[CircularLinkedNode] = None, tail: Optional[CircularLinkedNode] = None):
+        next_node = self.next
+        self.next = last_node
+        if next_node is None:
+            return tail
+        return next_node.reverse(self, next_node if tail is None else tail)
 
 
 class AbstractLinkedList(ABC, Collection):
