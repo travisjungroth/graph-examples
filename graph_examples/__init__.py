@@ -1,7 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections import Reversible
-from typing import Collection, Iterable, Iterator, Optional
+from typing import Iterable, Iterator, Optional, Reversible, Collection
 
 
 class AbstractLinkedNode(ABC, Collection):
