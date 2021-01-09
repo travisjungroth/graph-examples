@@ -33,21 +33,7 @@ class AbstractLinkedNode(ABC, Collection):
         pass
 
 
-class LinkedNode(AbstractLinkedNode):
-    def __init__(self, value, next_: Optional[LinkedNode] = None):
-        self.value = value
-        self.next = next_
-
-    @classmethod
-    def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
-        values_iter = iter(values)
-        try:
-            node = cls(next(values_iter))
-        except StopIteration:
-            return None
-        node.next = cls.from_iterable(values_iter)
-        return node
-
+class NonCircularLinkedNode(ABC, AbstractLinkedNode):
     def __len__(self) -> int:
         if self.next is None:
             return 1
@@ -62,6 +48,22 @@ class LinkedNode(AbstractLinkedNode):
         if value == self.value:
             return True
         return self.next is not None and value in self.next
+
+
+class LinkedNode(NonCircularLinkedNode):
+    def __init__(self, value, next_: Optional[LinkedNode] = None):
+        self.value = value
+        self.next = next_
+
+    @classmethod
+    def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
+        values_iter = iter(values)
+        try:
+            node = cls(next(values_iter))
+        except StopIteration:
+            return None
+        node.next = cls.from_iterable(values_iter)
+        return node
 
     def appendleft(self, value) -> LinkedNode:
         return LinkedNode(value, self)
