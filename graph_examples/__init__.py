@@ -81,13 +81,13 @@ class LinkedNode(NonCircularLinkedNode):
         return next_node.reverse(self)
 
 
-class DoubleLinkedNode(NonCircularLinkedNode):
-    def __init__(self, value, next_: Optional[DoubleLinkedNode] = None, last: Optional[DoubleLinkedNode] = None):
+class DoublyLinkedNode(NonCircularLinkedNode):
+    def __init__(self, value, next_: Optional[DoublyLinkedNode] = None, last: Optional[DoublyLinkedNode] = None):
         super().__init__(value, next_)
         self.last = last
 
     @classmethod
-    def from_iterable(cls, values: Iterable, last: Optional[DoubleLinkedNode] = None) -> Optional[DoubleLinkedNode]:
+    def from_iterable(cls, values: Iterable, last: Optional[DoublyLinkedNode] = None) -> Optional[DoublyLinkedNode]:
         values_iter = iter(values)
         try:
             node = cls(next(values_iter), None, last)
@@ -96,11 +96,11 @@ class DoubleLinkedNode(NonCircularLinkedNode):
         node.next = cls.from_iterable(values_iter, node)
         return node
 
-    def appendleft(self, value) -> DoubleLinkedNode:
-        self.last = DoubleLinkedNode(value, self)
+    def appendleft(self, value) -> DoublyLinkedNode:
+        self.last = DoublyLinkedNode(value, self)
         return self.last
 
-    def popleft(self) -> tuple[DoubleLinkedNode, object]:
+    def popleft(self) -> tuple[DoublyLinkedNode, object]:
         head = self.next
         head.last = None
         self.next = None
@@ -238,17 +238,17 @@ class LinkedList(NonCircularLinkedList):
         self.head = last_node
 
 
-class DoubleLinkedList(NonCircularLinkedList, Reversible):
+class DoublyLinkedList(NonCircularLinkedList, Reversible):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
-            self.head = DoubleLinkedNode(next(values_iter))
+            self.head = DoublyLinkedNode(next(values_iter))
         except StopIteration:
             self.head = None
             self.tail = None
         node = self.head
         for value in values_iter:
-            node.next = DoubleLinkedNode(value, None, node)
+            node.next = DoublyLinkedNode(value, None, node)
             node = node.next
         self.tail = node
 
@@ -260,7 +260,7 @@ class DoubleLinkedList(NonCircularLinkedList, Reversible):
 
     def append(self, value):
         old_tail = self.tail
-        self.tail = DoubleLinkedNode(value, None, old_tail)
+        self.tail = DoublyLinkedNode(value, None, old_tail)
         if old_tail is None:
             self.head = self.tail
         else:
@@ -268,7 +268,7 @@ class DoubleLinkedList(NonCircularLinkedList, Reversible):
 
     def appendleft(self, value):
         old_head = self.head
-        self.head = DoubleLinkedNode(value, old_head)
+        self.head = DoublyLinkedNode(value, old_head)
         if old_head is None:
             self.tail = self.head
         else:
