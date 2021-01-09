@@ -33,7 +33,11 @@ class AbstractLinkedNode(ABC, Collection):
         pass
 
 
-class NonCircularLinkedNode(ABC, AbstractLinkedNode):
+class NonCircularLinkedNode(AbstractLinkedNode, ABC):
+    def __init__(self, value, next_: Optional[LinkedNode] = None):
+        self.value = value
+        self.next = next_
+
     def __len__(self) -> int:
         if self.next is None:
             return 1
@@ -51,10 +55,6 @@ class NonCircularLinkedNode(ABC, AbstractLinkedNode):
 
 
 class LinkedNode(NonCircularLinkedNode):
-    def __init__(self, value, next_: Optional[LinkedNode] = None):
-        self.value = value
-        self.next = next_
-
     @classmethod
     def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
         values_iter = iter(values)
@@ -79,6 +79,38 @@ class LinkedNode(NonCircularLinkedNode):
         if next_node is None:
             return self
         return next_node.reverse(self)
+
+
+class DoubleLinkedNode(NonCircularLinkedNode):
+    def __init__(self, value, next_: Optional[DoubleLinkedNode] = None, last: Optional[DoubleLinkedNode] = None):
+        super().__init__(value, next_)
+        self.last = last
+
+    @classmethod
+    def from_iterable(cls, values: Iterable, last: Optional[DoubleLinkedNode] = None) -> Optional[DoubleLinkedNode]:
+        values_iter = iter(values)
+        try:
+            node = cls(next(values_iter), None, last)
+        except StopIteration:
+            return None
+        node.next = cls.from_iterable(values_iter, node)
+        return node
+
+    def appendleft(self, value) -> DoubleLinkedNode:
+        self.last = DoubleLinkedNode(value, self)
+        return self.last
+
+    def popleft(self) -> tuple[DoubleLinkedNode, object]:
+        head = self.next
+        head.last = None
+        self.next = None
+        return head, self.value
+
+    def reverse(self):
+        self.next, self.last = self.last, self.next
+        if self.last is None:
+            return self
+        return self.last.reverse()
 
 
 class CircularLinkedNode(AbstractLinkedNode):
