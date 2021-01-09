@@ -1,5 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from collections import Reversible
 from typing import Collection, Iterable, Iterator, Optional
 
 
@@ -180,17 +181,8 @@ class AbstractLinkedList(ABC, Collection):
         pass
 
 
-class LinkedList(AbstractLinkedList):
-    def __init__(self, values: Iterable = ()):
-        values_iter = iter(values)
-        try:
-            self.head = LinkedNode(next(values_iter))
-        except StopIteration:
-            self.head = None
-        node = self.head
-        for value in values_iter:
-            node.next = LinkedNode(value)
-            node = node.next
+class NonCircularLinkedList(AbstractLinkedList, ABC):
+    head: Optional[NonCircularLinkedNode]
 
     def __len__(self) -> int:
         length = 0
@@ -214,6 +206,19 @@ class LinkedList(AbstractLinkedList):
             node = node.next
         return False
 
+
+class LinkedList(NonCircularLinkedList):
+    def __init__(self, values: Iterable = ()):
+        values_iter = iter(values)
+        try:
+            self.head = LinkedNode(next(values_iter))
+        except StopIteration:
+            self.head = None
+        node = self.head
+        for value in values_iter:
+            node.next = LinkedNode(value)
+            node = node.next
+
     def appendleft(self, value):
         self.head = LinkedNode(value, self.head)
 
@@ -228,6 +233,67 @@ class LinkedList(AbstractLinkedList):
         while node is not None:
             node.next, last_node, node = last_node, node, node.next
         self.head = last_node
+
+
+class DoubleLinkedList(NonCircularLinkedList, Reversible):
+    def __init__(self, values: Iterable = ()):
+        values_iter = iter(values)
+        try:
+            self.head = DoubleLinkedNode(next(values_iter))
+        except StopIteration:
+            self.head = None
+            self.tail = None
+        node = self.head
+        for value in values_iter:
+            node.next = DoubleLinkedNode(value, None, node)
+            node = node.next
+        self.tail = node
+
+    def __reversed__(self) -> Iterator:
+        node = self.tail
+        while node is not None:
+            yield node.value
+            node = node.last
+
+    def append(self, value):
+        old_tail = self.tail
+        self.tail = DoubleLinkedNode(value, None, old_tail)
+        if old_tail is None:
+            self.head = self.tail
+        else:
+            old_tail.next = self.tail
+
+    def appendleft(self, value):
+        old_head = self.head
+        self.head = DoubleLinkedNode(value, old_head)
+        if old_head is None:
+            self.tail = self.head
+        else:
+            old_head.last = self.head
+
+    def pop(self):
+        old_tail = self.tail
+        self.tail = old_tail.last
+        if self.tail is None:
+            self.head = None
+        else:
+            self.tail.next = None
+        return old_tail.value
+
+    def popleft(self):
+        old_head = self.head
+        self.head = old_head.next
+        if self.head is None:
+            self.tail = None
+        else:
+            self.head.last = None
+        return old_head.value
+
+    def reverse(self):
+        node = self.head
+        self.head, self.tail = self.tail, self.head
+        while node is not None:
+            node.next, node.last, node = node.last, node.next, node.next
 
 
 class CircularLinkedList(AbstractLinkedList):
