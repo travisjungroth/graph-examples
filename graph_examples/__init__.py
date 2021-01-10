@@ -11,14 +11,6 @@ class AbstractLinkedNode(ABC, Collection):
         return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
                f'next={repr(self.next.value) if self.next is not None else "END"})'
 
-    @abstractmethod
-    def __iter__(self) -> Iterator:
-        pass
-
-    @abstractmethod
-    def __contains__(self, value) -> bool:
-        pass
-
     @classmethod
     @abstractmethod
     def from_iterable(cls, values: Iterable) -> Optional[AbstractLinkedNode]:
