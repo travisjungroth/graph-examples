@@ -113,8 +113,9 @@ class DoublyLinkedNode(NonCircularLinkedNode):
 
     def popleft(self) -> tuple[DoublyLinkedNode, object]:
         head = self.next
-        head.last = None
-        self.next = None
+        if head is not None:
+            head.last = None
+            self.next = None
         return head, self.value
 
     def reverse(self):

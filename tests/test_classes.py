@@ -42,3 +42,17 @@ class TestAbstractLinkedNode:
         for letter in letters:
             assert letter in node
         assert object() not in node
+
+    def test_appendleft(self, cls, letters):
+        node = cls.from_iterable(letters)
+        node = node.appendleft('x')
+        assert list(node) == list('x' + letters)
+
+    def test_popleft(self, cls, letters):
+        node = cls.from_iterable(letters)
+        values = []
+        while node:
+            node, value = node.popleft()
+            values.append(value)
+        assert node is None
+        assert values == list(letters)
