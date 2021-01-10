@@ -145,3 +145,7 @@ class TestAbstractCircularLinkedList:
     def test_infinite_iterator(self, cls, letters):
         li = cls(letters)
         assert list(islice(li.infinite_iterator(), len(letters) * 3)) == list(letters * 3)
+
+    def test_infinite_iterator_empty(self, cls):
+        li = cls()
+        assert not list(li.infinite_iterator())
