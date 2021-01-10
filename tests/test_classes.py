@@ -4,7 +4,13 @@ from typing import TypeVar
 
 from pytest import mark, fixture, raises
 
-from graph_examples import AbstractLinkedNode, AbstractLinkedList, AbstractDoublyLinkedList, AbstractCircularLinkedList
+from graph_examples import (
+    AbstractLinkedNode,
+    AbstractLinkedList,
+    AbstractDoublyLinkedList,
+    AbstractCircularLinkedList,
+    CircularDoublyLinkedNode,
+)
 
 T = TypeVar('T', bound=type)
 
@@ -67,6 +73,25 @@ class TestAbstractLinkedNode:
         node = cls.from_iterable(letters)
         node = node.reverse()
         assert list(node) == list(reversed(letters))
+
+
+class TestCircularDoublyLinkedNode:
+    def test_reversed(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        assert list(reversed(node)) == list(reversed(letters))
+
+    def test_pop(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        values = []
+        while node:
+            node, value = node.pop()
+            values.append(value)
+        assert values == list(reversed(letters))
+
+    def test_append(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        node = node.append('x')
+        assert list(node) == list(letters + 'x')
 
 
 @mark.parametrize('cls', concrete_subclasses(AbstractLinkedList))
