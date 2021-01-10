@@ -1,11 +1,12 @@
 from abc import ABC
+from itertools import islice
 from typing import TypeVar
 
 from pytest import mark, fixture, raises
 
-from graph_examples import AbstractLinkedNode, AbstractLinkedList, AbstractDoublyLinkedList
+from graph_examples import AbstractLinkedNode, AbstractLinkedList, AbstractDoublyLinkedList, AbstractCircularLinkedList
 
-T = TypeVar('T')
+T = TypeVar('T', bound=type)
 
 
 def concrete_subclasses(cls: T, *except_: T) -> list[T]:
@@ -137,3 +138,10 @@ class TestAbstractDoublyLinkedList:
         li = cls(letters_and_empty)
         li.append('x')
         assert list(li) == list(letters_and_empty + 'x')
+
+
+@mark.parametrize('cls', concrete_subclasses(AbstractCircularLinkedList))
+class TestAbstractCircularLinkedList:
+    def test_infinite_iterator(self, cls, letters):
+        li = cls(letters)
+        assert list(islice(li.infinite_iterator(), len(letters) * 3)) == list(letters * 3)
