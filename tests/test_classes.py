@@ -3,7 +3,7 @@ from typing import TypeVar
 
 from pytest import mark, fixture
 
-from graph_examples import AbstractLinkedNode
+from graph_examples import AbstractLinkedNode, AbstractLinkedList
 
 T = TypeVar('T')
 
@@ -24,6 +24,11 @@ def concrete_subclasses(cls: T, *except_: T) -> list[T]:
 
 @fixture(params=['a', 'ab', 'abc'])
 def letters(request) -> str:
+    return request.param
+
+
+@fixture(params=['', 'a', 'ab', 'abc'])
+def letters_and_empty(request) -> str:
     return request.param
 
 
@@ -56,3 +61,16 @@ class TestAbstractLinkedNode:
             values.append(value)
         assert node is None
         assert values == list(letters)
+
+    def test_reverse(self, cls, letters):
+        node = cls.from_iterable(letters)
+        node = node.reverse()
+        assert list(node) == list(reversed(letters))
+
+
+@mark.parametrize('cls', concrete_subclasses(AbstractLinkedList))
+class TestAbstractLinkedList:
+    def test_len(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        assert len(li) == len(letters_and_empty)
+

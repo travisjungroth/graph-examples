@@ -272,6 +272,9 @@ class AbstractLinkedList(ABC, Collection):
 class NonCircularLinkedList(AbstractLinkedList, ABC):
     head: Optional[NonCircularLinkedNode]
 
+    def __bool__(self):
+        return self.head is not None
+
     def __len__(self) -> int:
         length = 0
         node = self.head
@@ -387,6 +390,9 @@ class DoublyLinkedList(NonCircularLinkedList, Reversible):
 class AbstractCircularLinkedList(AbstractLinkedList, ABC):
     tail: Optional[AbstractCircularLinkedNode]
     head: Optional[AbstractCircularLinkedNode]
+
+    def __bool__(self):
+        return self.tail is not None
 
     def __len__(self) -> int:
         if not self:
