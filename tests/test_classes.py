@@ -1,9 +1,9 @@
 from abc import ABC
 from typing import TypeVar
 
-from pytest import mark, fixture
+from pytest import mark, fixture, raises
 
-from graph_examples import AbstractLinkedNode, AbstractLinkedList
+from graph_examples import AbstractLinkedNode, AbstractLinkedList, AbstractDoublyLinkedList
 
 T = TypeVar('T')
 
@@ -106,3 +106,29 @@ class TestAbstractLinkedList:
         li = cls(letters_and_empty)
         li.reverse()
         assert list(li) == list(reversed(letters_and_empty))
+
+
+@mark.parametrize('cls', concrete_subclasses(AbstractDoublyLinkedList))
+class TestAbstractDoublyLinkedList:
+    def test_reversed(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        assert list(reversed(li)) == list(reversed(letters_and_empty))
+
+    def test_pop(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        values = []
+        while li:
+            value = li.pop()
+            values.append(value)
+        assert not li
+        assert values == list(reversed(letters_and_empty))
+
+    def test_pop_empty(self, cls):
+        li = cls()
+        with raises(IndexError):
+            li.pop()
+
+    def test_append(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        li.append('x')
+        assert list(li) == list(letters_and_empty + 'x')

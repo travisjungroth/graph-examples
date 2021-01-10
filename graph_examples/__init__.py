@@ -261,6 +261,16 @@ class AbstractLinkedList(ABC, Collection):
         pass
 
 
+class AbstractDoublyLinkedList(AbstractLinkedList, ABC):
+    @abstractmethod
+    def pop(self):
+        pass
+
+    @abstractmethod
+    def append(self, value):
+        pass
+
+
 class NonCircularLinkedList(AbstractLinkedList, ABC):
     head: Optional[NonCircularLinkedNode]
 
@@ -318,7 +328,7 @@ class LinkedList(NonCircularLinkedList):
         self.head = last_node
 
 
-class DoublyLinkedList(NonCircularLinkedList, Reversible):
+class DoublyLinkedList(NonCircularLinkedList, AbstractDoublyLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
@@ -355,6 +365,8 @@ class DoublyLinkedList(NonCircularLinkedList, Reversible):
             old_head.last = self.head
 
     def pop(self):
+        if not self:
+            raise IndexError
         old_tail = self.tail
         self.tail = old_tail.last
         if self.tail is None:
@@ -472,7 +484,7 @@ class CircularLinkedList(AbstractCircularLinkedList):
         self.tail.next, self.tail = last_node, self.head
 
 
-class CircularDoublyLinkedList(AbstractCircularLinkedList, Reversible):
+class CircularDoublyLinkedList(AbstractCircularLinkedList, AbstractDoublyLinkedList):
     tail: Optional[CircularDoublyLinkedNode]
     head: Optional[CircularDoublyLinkedNode]
 
