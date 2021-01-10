@@ -4,8 +4,12 @@ from typing import Iterable, Iterator, Optional, Reversible, Collection
 
 
 class AbstractLinkedNode(ABC, Collection):
+    value: object
+
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}.from_iterable({repr([x for x in self])})'
+        self.next: Optional[AbstractLinkedNode]
+        return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
+               f'next={repr(self.next.value) if self.next is not None else "END"})'
 
     @abstractmethod
     def __iter__(self) -> Iterator:
@@ -55,6 +59,8 @@ class NonCircularLinkedNode(AbstractLinkedNode, ABC):
 
 
 class LinkedNode(NonCircularLinkedNode):
+    next: Optional[LinkedNode]
+
     @classmethod
     def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
         values_iter = iter(values)
@@ -85,6 +91,11 @@ class DoublyLinkedNode(NonCircularLinkedNode):
     def __init__(self, value, next_: Optional[DoublyLinkedNode] = None, last: Optional[DoublyLinkedNode] = None):
         super().__init__(value, next_)
         self.last = last
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
+               f'next={repr(self.next.value) if self.next is not None else "END"}, ' \
+               f'last={repr(self.last.value) if self.last is not None else "END"})'
 
     @classmethod
     def from_iterable(cls, values: Iterable, last: Optional[DoublyLinkedNode] = None) -> Optional[DoublyLinkedNode]:
@@ -176,6 +187,11 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, Reversible):
     ):
         super().__init__(value, next_)
         self.last = last if last is not None else self
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
+               f'next={repr(self.next.value) if self.next is not None else "END"}, ' \
+               f'last={repr(self.last.value) if self.last is not None else "END"})'
 
     @classmethod
     def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularDoublyLinkedNode]:
