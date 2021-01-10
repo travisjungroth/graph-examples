@@ -316,6 +316,8 @@ class LinkedList(NonCircularLinkedList):
         self.head = LinkedNode(value, self.head)
 
     def popleft(self):
+        if not self:
+            raise IndexError
         node = self.head
         self.head = node.next
         return node.value
@@ -376,6 +378,8 @@ class DoublyLinkedList(NonCircularLinkedList, AbstractDoublyLinkedList):
         return old_tail.value
 
     def popleft(self):
+        if not self:
+            raise IndexError
         old_head = self.head
         self.head = old_head.next
         if self.head is None:

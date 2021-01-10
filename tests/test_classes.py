@@ -102,6 +102,11 @@ class TestAbstractLinkedList:
         assert not li
         assert values == list(letters_and_empty)
 
+    def test_popleft_empty(self, cls):
+        li = cls()
+        with raises(IndexError):
+            li.popleft()
+
     def test_reverse(self, cls, letters_and_empty):
         li = cls(letters_and_empty)
         li.reverse()
