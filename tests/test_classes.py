@@ -74,3 +74,35 @@ class TestAbstractLinkedList:
         li = cls(letters_and_empty)
         assert len(li) == len(letters_and_empty)
 
+    def test_iter(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        assert list(li) == list(letters_and_empty)
+
+    def test_contains(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        for letter in letters_and_empty:
+            assert letter in li
+        assert object() not in li
+
+    def test_bool(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        assert bool(li) == bool(letters_and_empty)
+
+    def test_appendleft(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        li.appendleft('x')
+        assert list(li) == list('x' + letters_and_empty)
+
+    def test_popleft(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        values = []
+        while li:
+            value = li.popleft()
+            values.append(value)
+        assert not li
+        assert values == list(letters_and_empty)
+
+    def test_reverse(self, cls, letters_and_empty):
+        li = cls(letters_and_empty)
+        li.reverse()
+        assert list(li) == list(reversed(letters_and_empty))
