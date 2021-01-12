@@ -13,6 +13,8 @@ from graph_examples import (
     CircularDoublyLinkedNode,
 )
 
+pytestmark = mark.timeout(.1)
+
 T = TypeVar('T', bound=type)
 
 
@@ -71,7 +73,7 @@ class TestAbstractLinkedNode:
         while node:
             assert list(node) == list(letters[-len(node):])
             with suppress(TypeError):
-                assert list(reversed(node)) == list(letters[:-len(node)-1:-1])
+                assert list(reversed(node)) == list(letters[:-len(node) - 1:-1])
             node, value = node.popleft()
             values.append(value)
         assert node is None
@@ -93,7 +95,7 @@ class TestCircularDoublyLinkedNode:
         values = []
         while node:
             assert list(node) == list(letters[:len(node)])
-            assert list(reversed(node)) == list(letters[len(node)-1::-1])
+            assert list(reversed(node)) == list(letters[len(node) - 1::-1])
             node, value = node.pop()
             values.append(value)
         assert values == list(reversed(letters))
