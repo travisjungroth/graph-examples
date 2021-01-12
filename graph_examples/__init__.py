@@ -77,7 +77,20 @@ class LinkedNode(NonCircularLinkedNode):
         return next_node.reverse(self)
 
 
-class DoublyLinkedNode(NonCircularLinkedNode):
+class AbstractDoublyLinkedNode(AbstractLinkedNode, ABC, Reversible):
+    head: AbstractDoublyLinkedNode
+    tail: AbstractDoublyLinkedNode
+
+    @abstractmethod
+    def pop(self):
+        pass
+
+    @abstractmethod
+    def append(self, value):
+        pass
+
+
+class DoublyLinkedNode(NonCircularLinkedNode, AbstractDoublyLinkedNode):
     def __init__(self, value, next_: Optional[DoublyLinkedNode] = None, last: Optional[DoublyLinkedNode] = None):
         super().__init__(value, next_)
         self.last = last
@@ -97,9 +110,37 @@ class DoublyLinkedNode(NonCircularLinkedNode):
         node.next = cls.from_iterable(values_iter, node)
         return node
 
+    @property
+    def head(self) -> DoublyLinkedNode:
+        node = self
+        while node.last is not None:
+            node = node.last
+        return node
+
+    @property
+    def tail(self) -> DoublyLinkedNode:
+        node = self
+        while node.next is not None:
+            node = node.next
+        return node
+
+    def __reversed__(self) -> Iterator:
+        yield self.value
+        if self.last is not None:
+            yield from reversed(self.last)
+
+    def append(self, value) -> DoublyLinkedNode:
+        self.next = DoublyLinkedNode(value, None, self)
+        return self.next
+
     def appendleft(self, value) -> DoublyLinkedNode:
         self.last = DoublyLinkedNode(value, self)
         return self.last
+
+    def pop(self) -> tuple[DoublyLinkedNode, object]:
+        if self.last is not None:
+            self.last.next = None
+        return self.last, self.value
 
     def popleft(self) -> tuple[DoublyLinkedNode, object]:
         if self.next is not None:
@@ -167,7 +208,7 @@ class CircularLinkedNode(AbstractCircularLinkedNode):
         return next_node.reverse(self, next_node if tail is None else tail)
 
 
-class CircularDoublyLinkedNode(AbstractCircularLinkedNode, Reversible):
+class CircularDoublyLinkedNode(AbstractCircularLinkedNode, AbstractDoublyLinkedNode):
     def __init__(
             self,
             value,
@@ -193,6 +234,14 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, Reversible):
             return cls.from_iterable(values_iter, node if head is None else head, node)
         except StopIteration:
             return last_node
+
+    @property
+    def head(self) -> CircularDoublyLinkedNode:
+        return self.next
+
+    @property
+    def tail(self) -> CircularDoublyLinkedNode:
+        return self
 
     def __reversed__(self, tail: Optional[CircularDoublyLinkedNode] = None) -> Iterator:
         if self is tail:
@@ -257,7 +306,7 @@ class AbstractLinkedList(ABC, Collection):
         pass
 
 
-class AbstractDoublyLinkedList(AbstractLinkedList, ABC):
+class AbstractDoublyLinkedList(AbstractLinkedList, ABC, Reversible):
     @abstractmethod
     def pop(self):
         pass
@@ -333,7 +382,6 @@ class DoublyLinkedList(NonCircularLinkedList, AbstractDoublyLinkedList):
             self.head = DoublyLinkedNode(next(values_iter))
         except StopIteration:
             self.head = None
-            self.tail = None
         node = self.head
         for value in values_iter:
             node.next = DoublyLinkedNode(value, None, node)

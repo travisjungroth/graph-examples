@@ -1,5 +1,4 @@
 from abc import ABC
-from contextlib import suppress
 from itertools import islice
 from typing import TypeVar
 
@@ -10,7 +9,7 @@ from graph_examples import (
     AbstractLinkedList,
     AbstractDoublyLinkedList,
     AbstractCircularLinkedList,
-    CircularDoublyLinkedNode,
+    AbstractDoublyLinkedNode,
 )
 
 pytestmark = mark.timeout(.1)
@@ -64,16 +63,24 @@ class TestAbstractLinkedNode:
         node = cls.from_iterable(letters)
         node = node.appendleft('x')
         assert list(node) == list('x' + letters)
-        with suppress(TypeError):
-            assert list(reversed(node)) == list(reversed('x' + letters))
+        try:
+            tail = node.tail
+        except AttributeError:
+            pass
+        else:
+            assert list(reversed(tail)) == list(reversed('x' + letters))
 
     def test_popleft(self, cls, letters):
         node = cls.from_iterable(letters)
         values = []
         while node:
             assert list(node) == list(letters[-len(node):])
-            with suppress(TypeError):
-                assert list(reversed(node)) == list(letters[:-len(node) - 1:-1])
+            try:
+                tail = node.tail
+            except AttributeError:
+                pass
+            else:
+                assert list(reversed(tail)) == list(letters[:-len(node) - 1:-1])
             node, value = node.popleft()
             values.append(value)
         assert node is None
@@ -85,26 +92,27 @@ class TestAbstractLinkedNode:
         assert list(node) == list(reversed(letters))
 
 
-class TestCircularDoublyLinkedNode:
-    def test_reversed(self, letters):
-        node = CircularDoublyLinkedNode.from_iterable(letters)
-        assert list(reversed(node)) == list(reversed(letters))
+@mark.parametrize('cls', concrete_subclasses(AbstractDoublyLinkedNode))
+class TestAbstractDoublyLinkedNode:
+    def test_reversed(self, cls, letters):
+        node = cls.from_iterable(letters)
+        assert list(reversed(node.tail)) == list(reversed(letters))
 
-    def test_pop(self, letters):
-        node = CircularDoublyLinkedNode.from_iterable(letters)
+    def test_pop(self, cls, letters):
+        tail = cls.from_iterable(letters).tail
         values = []
-        while node:
-            assert list(node) == list(letters[:len(node)])
-            assert list(reversed(node)) == list(letters[len(node) - 1::-1])
-            node, value = node.pop()
+        while tail:
+            # assert list(tail) == list(letters[:len(tail.head)]) fix this
+            assert list(reversed(tail)) == list(letters[len(tail.head) - 1::-1])
+            tail, value = tail.pop()
             values.append(value)
         assert values == list(reversed(letters))
 
-    def test_append(self, letters):
-        node = CircularDoublyLinkedNode.from_iterable(letters)
-        node = node.append('x')
-        assert list(node) == list(letters + 'x')
-        assert list(reversed(node)) == list(reversed(letters + 'x'))
+    def test_append(self, cls, letters):
+        node = cls.from_iterable(letters)
+        tail = node.tail.append('x')
+        assert list(node.head) == list(letters + 'x')
+        assert list(reversed(tail)) == list(reversed(letters + 'x'))
 
 
 @mark.parametrize('cls', concrete_subclasses(AbstractLinkedList))
@@ -131,16 +139,24 @@ class TestAbstractLinkedList:
         li = cls(letters_and_empty)
         li.appendleft('x')
         assert list(li) == list('x' + letters_and_empty)
-        with suppress(TypeError):
-            assert list(reversed(li)) == list(reversed('x' + letters))
+        try:
+            reversed_li = reversed(li)
+        except TypeError:
+            pass
+        else:
+            assert list(reversed_li) == list(reversed('x' + letters_and_empty))
 
     def test_popleft(self, cls, letters_and_empty):
         li = cls(letters_and_empty)
         values = []
         while li:
             assert list(li) == list(letters_and_empty[-len(li):])
-            with suppress(TypeError):
-                assert list(reversed(li)) == list(letters_and_empty[:-len(li) - 1:-1])
+            try:
+                reversed_li = reversed(li)
+            except TypeError:
+                pass
+            else:
+                assert list(reversed_li) == list(letters_and_empty[:-len(li) - 1:-1])
             value = li.popleft()
             values.append(value)
         assert not li
@@ -167,6 +183,8 @@ class TestAbstractDoublyLinkedList:
         li = cls(letters_and_empty)
         values = []
         while li:
+            assert list(li) == list(letters_and_empty[:len(li)])
+            assert list(reversed(li)) == list(letters_and_empty[len(li) - 1::-1])
             value = li.pop()
             values.append(value)
         assert not li
