@@ -21,7 +21,9 @@ def concrete_subclasses(cls: T, *except_: T) -> list[T]:
     queue = [cls]
     concrete = []
     while queue:
-        for cls in set(queue.pop(0).__subclasses__()) - seen - except_:
+        subclasses = set(queue.pop(0).__subclasses__())
+        to_see = sorted(subclasses - seen - except_, key=lambda x: x.__name__)  # sort to be deterministic
+        for cls in to_see:
             seen.add(cls)
             queue.append(cls)
             if ABC not in cls.__bases__:
