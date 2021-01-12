@@ -126,8 +126,8 @@ class TestDoublyLinkedNode:
         tail = head.tail
         values = []
         while tail:
-            assert list(head) == list(letters[:len(head)])
             assert list(reversed(tail)) == list(letters[len(head) - 1::-1])
+            assert list(head) == list(letters[:len(head)])
             tail, value = tail.pop()
             values.append(value)
         assert values == list(reversed(letters))

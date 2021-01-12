@@ -78,9 +78,6 @@ class LinkedNode(NonCircularLinkedNode):
 
 
 class AbstractDoublyLinkedNode(AbstractLinkedNode, ABC, Reversible):
-    head: AbstractDoublyLinkedNode
-    tail: AbstractDoublyLinkedNode
-
     @abstractmethod
     def pop(self):
         pass
@@ -108,13 +105,6 @@ class DoublyLinkedNode(NonCircularLinkedNode, AbstractDoublyLinkedNode):
         except StopIteration:
             return None
         node.next = cls.from_iterable(values_iter, node)
-        return node
-
-    @property
-    def head(self) -> DoublyLinkedNode:
-        node = self
-        while node.last is not None:
-            node = node.last
         return node
 
     @property
@@ -234,14 +224,6 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, AbstractDoublyLinkedN
             return cls.from_iterable(values_iter, node if head is None else head, node)
         except StopIteration:
             return last_node
-
-    @property
-    def head(self) -> CircularDoublyLinkedNode:
-        return self.next
-
-    @property
-    def tail(self) -> CircularDoublyLinkedNode:
-        return self
 
     def __reversed__(self, tail: Optional[CircularDoublyLinkedNode] = None) -> Iterator:
         if self is tail:
