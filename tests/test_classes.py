@@ -5,10 +5,10 @@ from typing import TypeVar
 from pytest import mark, fixture, raises
 
 from graph_examples import (
-    AbstractLinkedNode,
-    AbstractLinkedList,
-    AbstractDoublyLinkedList,
-    AbstractCircularLinkedList,
+    BaseLinkedNode,
+    BaseLinkedList,
+    BaseDoublyLinkedList,
+    BaseCircularLinkedList,
     CircularDoublyLinkedNode,
     DoublyLinkedNode,
 )
@@ -44,7 +44,7 @@ def letters_and_empty(request) -> str:
     return request.param
 
 
-@mark.parametrize('cls', concrete_subclasses(AbstractLinkedNode))
+@mark.parametrize('cls', concrete_subclasses(BaseLinkedNode))
 class TestAbstractLinkedNode:
     def test_len(self, cls, letters):
         node = cls.from_iterable(letters)
@@ -139,7 +139,7 @@ class TestDoublyLinkedNode:
         assert list(reversed(tail)) == list(reversed(letters + 'x'))
 
 
-@mark.parametrize('cls', concrete_subclasses(AbstractLinkedList))
+@mark.parametrize('cls', concrete_subclasses(BaseLinkedList))
 class TestAbstractLinkedList:
     def test_len(self, cls, letters_and_empty):
         li = cls(letters_and_empty)
@@ -197,7 +197,7 @@ class TestAbstractLinkedList:
         assert list(li) == list(reversed(letters_and_empty))
 
 
-@mark.parametrize('cls', concrete_subclasses(AbstractDoublyLinkedList))
+@mark.parametrize('cls', concrete_subclasses(BaseDoublyLinkedList))
 class TestAbstractDoublyLinkedList:
     def test_reversed(self, cls, letters_and_empty):
         li = cls(letters_and_empty)
@@ -226,7 +226,7 @@ class TestAbstractDoublyLinkedList:
         assert list(reversed(li)) == list(reversed(letters_and_empty + 'x'))
 
 
-@mark.parametrize('cls', concrete_subclasses(AbstractCircularLinkedList))
+@mark.parametrize('cls', concrete_subclasses(BaseCircularLinkedList))
 class TestAbstractCircularLinkedList:
     def test_infinite_iterator(self, cls, letters):
         li = cls(letters)

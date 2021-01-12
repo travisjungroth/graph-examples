@@ -3,25 +3,25 @@ from abc import ABC, abstractmethod
 from typing import Iterable, Iterator, Optional, Reversible, Collection
 
 
-class AbstractLinkedNode(ABC, Collection):
+class BaseLinkedNode(ABC, Collection):
     value: object
 
     def __repr__(self) -> str:
-        self.next: Optional[AbstractLinkedNode]
+        self.next: Optional[BaseLinkedNode]
         return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
                f'next={repr(self.next.value) if self.next is not None else "END"})'
 
     @classmethod
     @abstractmethod
-    def from_iterable(cls, values: Iterable) -> Optional[AbstractLinkedNode]:
+    def from_iterable(cls, values: Iterable) -> Optional[BaseLinkedNode]:
         pass
 
     @abstractmethod
-    def appendleft(self, value) -> AbstractLinkedNode:
+    def appendleft(self, value) -> BaseLinkedNode:
         pass
 
     @abstractmethod
-    def popleft(self) -> tuple[AbstractLinkedNode, object]:
+    def popleft(self) -> tuple[BaseLinkedNode, object]:
         pass
 
     @abstractmethod
@@ -29,7 +29,7 @@ class AbstractLinkedNode(ABC, Collection):
         pass
 
 
-class NonCircularLinkedNode(AbstractLinkedNode, ABC):
+class BaseLinearLinkedNode(BaseLinkedNode, ABC):
     def __init__(self, value, next_: Optional[LinkedNode] = None):
         self.value = value
         self.next = next_
@@ -50,7 +50,7 @@ class NonCircularLinkedNode(AbstractLinkedNode, ABC):
         return self.next is not None and value in self.next
 
 
-class LinkedNode(NonCircularLinkedNode):
+class LinkedNode(BaseLinearLinkedNode):
     next: Optional[LinkedNode]
 
     @classmethod
@@ -77,7 +77,7 @@ class LinkedNode(NonCircularLinkedNode):
         return next_node.reverse(self)
 
 
-class AbstractDoublyLinkedNode(AbstractLinkedNode, ABC, Reversible):
+class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
     @abstractmethod
     def pop(self):
         pass
@@ -87,7 +87,7 @@ class AbstractDoublyLinkedNode(AbstractLinkedNode, ABC, Reversible):
         pass
 
 
-class DoublyLinkedNode(NonCircularLinkedNode, AbstractDoublyLinkedNode):
+class DoublyLinkedNode(BaseLinearLinkedNode, BaseDoublyLinkedNode):
     def __init__(self, value, next_: Optional[DoublyLinkedNode] = None, last: Optional[DoublyLinkedNode] = None):
         super().__init__(value, next_)
         self.last = last
@@ -144,7 +144,7 @@ class DoublyLinkedNode(NonCircularLinkedNode, AbstractDoublyLinkedNode):
         return self.last.reverse()
 
 
-class AbstractCircularLinkedNode(AbstractLinkedNode, ABC):
+class BaseCircularLinkedNode(BaseLinkedNode, ABC):
     def __init__(self, value, next_: Optional[CircularLinkedNode] = None):
         self.value = value
         self.next = next_ if next_ is not None else self
@@ -166,7 +166,7 @@ class AbstractCircularLinkedNode(AbstractLinkedNode, ABC):
         return value == self.value or self.next.__contains__(value, self if tail is None else tail)
 
 
-class CircularLinkedNode(AbstractCircularLinkedNode):
+class CircularLinkedNode(BaseCircularLinkedNode):
     @classmethod
     def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularLinkedNode]:
         values_iter = iter(values)
@@ -198,7 +198,7 @@ class CircularLinkedNode(AbstractCircularLinkedNode):
         return next_node.reverse(self, next_node if tail is None else tail)
 
 
-class CircularDoublyLinkedNode(AbstractCircularLinkedNode, AbstractDoublyLinkedNode):
+class CircularDoublyLinkedNode(BaseCircularLinkedNode, BaseDoublyLinkedNode):
     def __init__(
             self,
             value,
@@ -266,7 +266,7 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, AbstractDoublyLinkedN
         return self.last.reverse(self if head is None else head)
 
 
-class AbstractLinkedList(ABC, Collection):
+class BaseLinkedList(ABC, Collection):
     # noinspection PyUnusedLocal
     @abstractmethod
     def __init__(self, values: Iterable = ()):
@@ -288,7 +288,7 @@ class AbstractLinkedList(ABC, Collection):
         pass
 
 
-class AbstractDoublyLinkedList(AbstractLinkedList, ABC, Reversible):
+class BaseDoublyLinkedList(BaseLinkedList, ABC, Reversible):
     @abstractmethod
     def pop(self):
         pass
@@ -298,8 +298,8 @@ class AbstractDoublyLinkedList(AbstractLinkedList, ABC, Reversible):
         pass
 
 
-class NonCircularLinkedList(AbstractLinkedList, ABC):
-    head: Optional[NonCircularLinkedNode]
+class BaseLinearLinkedList(BaseLinkedList, ABC):
+    head: Optional[BaseLinearLinkedNode]
 
     def __bool__(self):
         return self.head is not None
@@ -327,7 +327,7 @@ class NonCircularLinkedList(AbstractLinkedList, ABC):
         return False
 
 
-class LinkedList(NonCircularLinkedList):
+class LinkedList(BaseLinearLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
@@ -357,7 +357,7 @@ class LinkedList(NonCircularLinkedList):
         self.head = last_node
 
 
-class DoublyLinkedList(NonCircularLinkedList, AbstractDoublyLinkedList):
+class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
@@ -421,9 +421,9 @@ class DoublyLinkedList(NonCircularLinkedList, AbstractDoublyLinkedList):
             node.next, node.last, node = node.last, node.next, node.next
 
 
-class AbstractCircularLinkedList(AbstractLinkedList, ABC):
-    tail: Optional[AbstractCircularLinkedNode]
-    head: Optional[AbstractCircularLinkedNode]
+class BaseCircularLinkedList(BaseLinkedList, ABC):
+    tail: Optional[BaseCircularLinkedNode]
+    head: Optional[BaseCircularLinkedNode]
 
     def __bool__(self):
         return self.tail is not None
@@ -477,7 +477,7 @@ class AbstractCircularLinkedList(AbstractLinkedList, ABC):
         return value
 
 
-class CircularLinkedList(AbstractCircularLinkedList):
+class CircularLinkedList(BaseCircularLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
@@ -514,7 +514,7 @@ class CircularLinkedList(AbstractCircularLinkedList):
         self.tail.next, self.tail = last_node, self.head
 
 
-class CircularDoublyLinkedList(AbstractCircularLinkedList, AbstractDoublyLinkedList):
+class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
     tail: Optional[CircularDoublyLinkedNode]
     head: Optional[CircularDoublyLinkedNode]
 
