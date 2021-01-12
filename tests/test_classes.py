@@ -69,6 +69,9 @@ class TestAbstractLinkedNode:
         node = cls.from_iterable(letters)
         values = []
         while node:
+            assert list(node) == list(letters[-len(node):])
+            with suppress(TypeError):
+                assert list(reversed(node)) == list(letters[:-len(node)-1:-1])
             node, value = node.popleft()
             values.append(value)
         assert node is None
@@ -89,6 +92,8 @@ class TestCircularDoublyLinkedNode:
         node = CircularDoublyLinkedNode.from_iterable(letters)
         values = []
         while node:
+            assert list(node) == list(letters[:len(node)])
+            assert list(reversed(node)) == list(letters[len(node)-1::-1])
             node, value = node.pop()
             values.append(value)
         assert values == list(reversed(letters))
@@ -97,6 +102,7 @@ class TestCircularDoublyLinkedNode:
         node = CircularDoublyLinkedNode.from_iterable(letters)
         node = node.append('x')
         assert list(node) == list(letters + 'x')
+        assert list(reversed(node)) == list(reversed(letters + 'x'))
 
 
 @mark.parametrize('cls', concrete_subclasses(AbstractLinkedList))
@@ -123,11 +129,16 @@ class TestAbstractLinkedList:
         li = cls(letters_and_empty)
         li.appendleft('x')
         assert list(li) == list('x' + letters_and_empty)
+        with suppress(TypeError):
+            assert list(reversed(li)) == list(reversed('x' + letters))
 
     def test_popleft(self, cls, letters_and_empty):
         li = cls(letters_and_empty)
         values = []
         while li:
+            assert list(li) == list(letters_and_empty[-len(li):])
+            with suppress(TypeError):
+                assert list(reversed(li)) == list(letters_and_empty[:-len(li) - 1:-1])
             value = li.popleft()
             values.append(value)
         assert not li
@@ -168,6 +179,7 @@ class TestAbstractDoublyLinkedList:
         li = cls(letters_and_empty)
         li.append('x')
         assert list(li) == list(letters_and_empty + 'x')
+        assert list(reversed(li)) == list(reversed(letters_and_empty + 'x'))
 
 
 @mark.parametrize('cls', concrete_subclasses(AbstractCircularLinkedList))

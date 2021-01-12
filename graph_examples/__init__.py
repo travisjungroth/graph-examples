@@ -202,7 +202,7 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, Reversible):
 
     def append(self, value) -> CircularDoublyLinkedNode:
         self.next = CircularDoublyLinkedNode(value, self.next, self)
-        self.next.last = self
+        self.next.next.last = self.next
         return self.next
 
     def appendleft(self, value) -> CircularDoublyLinkedNode:
@@ -505,11 +505,6 @@ class CircularDoublyLinkedList(AbstractCircularLinkedList, AbstractDoublyLinkedL
     def head(self) -> CircularDoublyLinkedNode:
         return self.tail.next
 
-    @head.setter
-    def head(self, node: CircularDoublyLinkedNode):
-        self.tail.next = node
-        self.head.next.last = self.head
-
     def __reversed__(self) -> Iterator:
         if not self:
             return
@@ -523,14 +518,16 @@ class CircularDoublyLinkedList(AbstractCircularLinkedList, AbstractDoublyLinkedL
         if not self:
             self.tail = CircularDoublyLinkedNode(value)
         else:
-            self.tail = CircularDoublyLinkedNode(value, self.tail.next, self.tail)
+            self.tail = CircularDoublyLinkedNode(value, self.head, self.tail)
             self.tail.last.next = self.tail
+            self.head.last = self.tail
 
     def appendleft(self, value):
         if not self:
             self.tail = CircularDoublyLinkedNode(value)
         else:
-            self.head = CircularDoublyLinkedNode(value, self.head, self.tail)
+            self.tail.next = CircularDoublyLinkedNode(value, self.head, self.tail)
+            self.head.next.last = self.tail.next
 
     def pop(self):
         if not self:
@@ -540,6 +537,17 @@ class CircularDoublyLinkedList(AbstractCircularLinkedList, AbstractDoublyLinkedL
             self.tail = None
         else:
             self.tail.last.next, self.head.last, self.tail = self.head, self.tail.last, self.tail.last
+        return value
+
+    def popleft(self):
+        if not self:
+            raise IndexError
+        value = self.head.value
+        if self.tail is self.head:
+            self.tail = None
+        else:
+            self.tail.next = self.tail.next.next
+            self.tail.next.last = self.tail
         return value
 
     def reverse(self):
