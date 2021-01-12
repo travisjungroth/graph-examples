@@ -1,4 +1,5 @@
 from abc import ABC
+from contextlib import suppress
 from itertools import islice
 from typing import TypeVar
 
@@ -61,6 +62,8 @@ class TestAbstractLinkedNode:
         node = cls.from_iterable(letters)
         node = node.appendleft('x')
         assert list(node) == list('x' + letters)
+        with suppress(TypeError):
+            assert list(reversed(node)) == list(reversed('x' + letters))
 
     def test_popleft(self, cls, letters):
         node = cls.from_iterable(letters)

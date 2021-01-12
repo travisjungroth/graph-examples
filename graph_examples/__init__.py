@@ -207,7 +207,7 @@ class CircularDoublyLinkedNode(AbstractCircularLinkedNode, Reversible):
 
     def appendleft(self, value) -> CircularDoublyLinkedNode:
         self.next = CircularDoublyLinkedNode(value, self.next, self)
-        self.next.last = self
+        self.next.next.last = self.next
         return self
 
     def pop(self) -> tuple[CircularDoublyLinkedNode, object]:
