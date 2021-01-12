@@ -9,10 +9,11 @@ from graph_examples import (
     AbstractLinkedList,
     AbstractDoublyLinkedList,
     AbstractCircularLinkedList,
-    AbstractDoublyLinkedNode,
+    CircularDoublyLinkedNode,
+    DoublyLinkedNode,
 )
 
-pytestmark = mark.timeout(.1)
+# pytestmark = mark.timeout(.1)
 
 T = TypeVar('T', bound=type)
 
@@ -92,26 +93,49 @@ class TestAbstractLinkedNode:
         assert list(node) == list(reversed(letters))
 
 
-@mark.parametrize('cls', concrete_subclasses(AbstractDoublyLinkedNode))
-class TestAbstractDoublyLinkedNode:
-    def test_reversed(self, cls, letters):
-        node = cls.from_iterable(letters)
-        assert list(reversed(node.tail)) == list(reversed(letters))
+class TestCircularDoublyLinkedNode:
+    def test_reversed(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        assert list(reversed(node)) == list(reversed(letters))
 
-    def test_pop(self, cls, letters):
-        tail = cls.from_iterable(letters).tail
+    def test_pop(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        values = []
+        while node:
+            assert list(node) == list(letters[:len(node)])
+            assert list(reversed(node)) == list(letters[len(node) - 1::-1])
+            node, value = node.pop()
+            values.append(value)
+        assert values == list(reversed(letters))
+
+    def test_append(self, letters):
+        node = CircularDoublyLinkedNode.from_iterable(letters)
+        node = node.append('x')
+        assert list(node) == list(letters + 'x')
+        assert list(reversed(node)) == list(reversed(letters + 'x'))
+
+
+class TestDoublyLinkedNode:
+    def test_reversed(self, letters):
+        head = DoublyLinkedNode.from_iterable(letters)
+        tail = head.tail
+        assert list(reversed(tail)) == list(reversed(letters))
+
+    def test_pop(self, letters):
+        head = DoublyLinkedNode.from_iterable(letters)
+        tail = head.tail
         values = []
         while tail:
-            # assert list(tail) == list(letters[:len(tail.head)]) fix this
-            assert list(reversed(tail)) == list(letters[len(tail.head) - 1::-1])
+            assert list(head) == list(letters[:len(head)])
+            assert list(reversed(tail)) == list(letters[len(head) - 1::-1])
             tail, value = tail.pop()
             values.append(value)
         assert values == list(reversed(letters))
 
-    def test_append(self, cls, letters):
-        node = cls.from_iterable(letters)
-        tail = node.tail.append('x')
-        assert list(node.head) == list(letters + 'x')
+    def test_append(self, letters):
+        head = DoublyLinkedNode.from_iterable(letters)
+        tail = head.tail.append('x')
+        assert list(head) == list(letters + 'x')
         assert list(reversed(tail)) == list(reversed(letters + 'x'))
 
 
