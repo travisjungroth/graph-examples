@@ -4,11 +4,11 @@ from typing import TypeVar
 
 from pytest import mark, fixture, raises
 
-from graph_examples import (
-    BaseLinkedNode,
-    BaseLinkedList,
-    BaseDoublyLinkedList,
+from graph_examples.linked_lists import (
     BaseCircularLinkedList,
+    BaseDoublyLinkedList,
+    BaseLinkedList,
+    BaseLinkedNode,
     CircularDoublyLinkedNode,
     DoublyLinkedNode,
 )
