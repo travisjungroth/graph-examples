@@ -67,9 +67,7 @@ class LinkedNode(NonCircularLinkedNode):
         return LinkedNode(value, self)
 
     def popleft(self) -> tuple[LinkedNode, object]:
-        head = self.next
-        self.next = None
-        return head, self.value
+        return self.next, self.value
 
     def reverse(self, last_node: Optional[LinkedNode] = None):
         next_node = self.next
@@ -104,11 +102,9 @@ class DoublyLinkedNode(NonCircularLinkedNode):
         return self.last
 
     def popleft(self) -> tuple[DoublyLinkedNode, object]:
-        head = self.next
-        if head is not None:
-            head.last = None
-            self.next = None
-        return head, self.value
+        if self.next is not None:
+            self.next.last = None
+        return self.next, self.value
 
     def reverse(self):
         self.next, self.last = self.last, self.next
