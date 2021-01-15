@@ -23,7 +23,7 @@ class LinkedNode(BaseLinearLinkedNode):
     def popleft(self) -> tuple[LinkedNode, object]:
         return self.next, self.value
 
-    def reverse(self, last_node: Optional[LinkedNode] = None):
+    def reverse(self, last_node: Optional[LinkedNode] = None) -> LinkedNode:
         next_node = self.next
         self.next = last_node
         if next_node is None:
@@ -31,15 +31,9 @@ class LinkedNode(BaseLinearLinkedNode):
         return next_node.reverse(self)
 
 
-class DoublyLinkedNode(BaseLinearLinkedNode, BaseDoublyLinkedNode):
-    def __init__(self, value, next_: Optional[DoublyLinkedNode] = None, last: Optional[DoublyLinkedNode] = None):
-        super().__init__(value, next_)
-        self.last = last
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
-               f'next={repr(self.next.value) if self.next is not None else "END"}, ' \
-               f'last={repr(self.last.value) if self.last is not None else "END"})'
+class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
+    next: Optional[DoublyLinkedNode]
+    last: Optional[DoublyLinkedNode]
 
     @classmethod
     def from_iterable(cls, values: Iterable, last: Optional[DoublyLinkedNode] = None) -> Optional[DoublyLinkedNode]:
@@ -81,7 +75,7 @@ class DoublyLinkedNode(BaseLinearLinkedNode, BaseDoublyLinkedNode):
             self.next.last = None
         return self.next, self.value
 
-    def reverse(self):
+    def reverse(self) -> DoublyLinkedNode:
         self.next, self.last = self.last, self.next
         if self.last is None:
             return self
@@ -89,6 +83,8 @@ class DoublyLinkedNode(BaseLinearLinkedNode, BaseDoublyLinkedNode):
 
 
 class CircularLinkedNode(BaseCircularLinkedNode):
+    next: CircularLinkedNode
+
     @classmethod
     def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularLinkedNode]:
         values_iter = iter(values)
@@ -112,7 +108,8 @@ class CircularLinkedNode(BaseCircularLinkedNode):
             self.next = self.next.next
             return self, value
 
-    def reverse(self, last_node: Optional[CircularLinkedNode] = None, tail: Optional[CircularLinkedNode] = None):
+    def reverse(self, last_node: Optional[CircularLinkedNode] = None,
+                tail: Optional[CircularLinkedNode] = None) -> CircularLinkedNode:
         next_node = self.next
         self.next = last_node
         if next_node is None:
@@ -120,20 +117,19 @@ class CircularLinkedNode(BaseCircularLinkedNode):
         return next_node.reverse(self, next_node if tail is None else tail)
 
 
-class CircularDoublyLinkedNode(BaseCircularLinkedNode, BaseDoublyLinkedNode):
+class CircularDoublyLinkedNode(BaseDoublyLinkedNode, BaseCircularLinkedNode):
+    next: CircularDoublyLinkedNode
+    last: CircularDoublyLinkedNode
+
     def __init__(
             self,
             value,
             next_: Optional[CircularDoublyLinkedNode] = None,
             last: Optional[CircularDoublyLinkedNode] = None
     ):
-        super().__init__(value, next_)
-        self.last = last if last is not None else self
-
-    def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
-               f'next={repr(self.next.value) if self.next is not None else "END"}, ' \
-               f'last={repr(self.last.value) if self.last is not None else "END"})'
+        next_ = next_ if next is not None else self
+        last = last if last is not None else self
+        super().__init__(value, next_, last)
 
     @classmethod
     def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularDoublyLinkedNode]:
@@ -181,7 +177,7 @@ class CircularDoublyLinkedNode(BaseCircularLinkedNode, BaseDoublyLinkedNode):
             self.next.last = self
             return self, value
 
-    def reverse(self, head: Optional[CircularDoublyLinkedNode] = None):
+    def reverse(self, head: Optional[CircularDoublyLinkedNode] = None) -> CircularDoublyLinkedNode:
         if self is head:
             return self.last
         self.next, self.last = self.last, self.next
