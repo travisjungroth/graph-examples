@@ -20,7 +20,6 @@ class BaseLinkedNode(ABC, Collection):
         self.next = next_
 
     def __repr__(self) -> str:
-        self.next: Optional[BaseLinkedNode]
         return f'{self.__class__.__name__}(value={repr(self.value)}, ' \
                f'next={repr(self.next.value) if self.next is not None else "END"})'
 
@@ -65,7 +64,9 @@ class BaseLinkedNode(ABC, Collection):
 
 
 class BaseSinglyLinkedNode(BaseLinkedNode, ABC):
-    pass
+    """A list with just a next node and no last.
+
+    This class has no attributes or methods over the BaseLinkedNode, but exists for inheritance clarity."""
 
 
 class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
@@ -113,6 +114,12 @@ class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
 
 
 class BaseLinearLinkedNode(BaseLinkedNode, ABC):
+    """The Abstract Base Class for all linear (non-circular) linked nodes in linked lists.
+
+    Any references to nodes should be optional, with None being considered terminal. Any introduced references to nodes
+    should follow this pattern.
+    """
+
     def __len__(self) -> int:
         """Recursively get the count of this node and the nodes that come after it."""
         if self.next is None:
@@ -137,24 +144,37 @@ class BaseLinearLinkedNode(BaseLinkedNode, ABC):
 
 
 class BaseCircularLinkedNode(BaseLinkedNode, ABC):
+    """The Abstract Base Class for all circular linked nodes in linked lists.
+
+    Args:
+        value: The value that occupies this position in the list.
+        next: The next node in the list. This is no longer optional. If nothing is provided, defaults to self.
+    """
     next: BaseCircularLinkedNode
 
-    def __init__(self, value, next_: Optional[BaseCircularLinkedNode] = None):
+    def __init__(self, value: object, next_: Optional[BaseCircularLinkedNode] = None):
         next_ = next_ if next_ is not None else self
         super().__init__(value, next_)
 
     def __len__(self, tail: Optional[BaseCircularLinkedNode] = None) -> int:
+        """Recursively get the count of this node and the nodes that come after it."""
         if self is tail:
             return 0
         return 1 + self.next.__len__(self if tail is None else tail)
 
     def __iter__(self, tail: Optional[BaseCircularLinkedNode] = None) -> Iterator:
+        """Recursively iterate through the nodes.
+
+        Yields:
+            The values from this node and the ones after it.
+        """
         if self is tail:
             return
         yield self.next.value
         yield from self.next.__iter__(self if tail is None else tail)
 
     def __contains__(self, value, tail: Optional[BaseCircularLinkedNode] = None) -> bool:
+        """Recursively search for the value on this node and the ones after in O(n) time."""
         if self is tail:
             return False
         return value == self.value or self.next.__contains__(value, self if tail is None else tail)
