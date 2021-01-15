@@ -2,11 +2,16 @@ from __future__ import annotations
 
 from typing import Iterable, Iterator, Optional
 
-from graph_examples.linked_lists.base_lists import BaseCircularLinkedList, BaseLinearLinkedList, BaseDoublyLinkedList
+from graph_examples.linked_lists.base_lists import (
+    BaseCircularLinkedList,
+    BaseLinearLinkedList,
+    BaseDoublyLinkedList,
+    BaseSinglyLinkedList,
+)
 from graph_examples.linked_lists.nodes import LinkedNode, DoublyLinkedNode, CircularLinkedNode, CircularDoublyLinkedNode
 
 
-class LinkedList(BaseLinearLinkedList):
+class LinkedList(BaseLinearLinkedList, BaseSinglyLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:
@@ -100,7 +105,7 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
             node.next, node.last, node = node.last, node.next, node.next
 
 
-class CircularLinkedList(BaseCircularLinkedList):
+class CircularLinkedList(BaseCircularLinkedList, BaseSinglyLinkedList):
     def __init__(self, values: Iterable = ()):
         values_iter = iter(values)
         try:

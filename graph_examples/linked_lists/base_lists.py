@@ -28,6 +28,10 @@ class BaseLinkedList(ABC, Collection):
         pass
 
 
+class BaseSinglyLinkedList(BaseLinkedList, ABC):
+    pass
+
+
 class BaseDoublyLinkedList(BaseLinkedList, ABC, Reversible):
     @abstractmethod
     def pop(self):

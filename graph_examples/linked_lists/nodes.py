@@ -1,10 +1,15 @@
 from __future__ import annotations
 from typing import Optional, Iterable, Iterator
 
-from graph_examples.linked_lists.base_nodes import BaseLinearLinkedNode, BaseDoublyLinkedNode, BaseCircularLinkedNode
+from graph_examples.linked_lists.base_nodes import (
+    BaseLinearLinkedNode,
+    BaseDoublyLinkedNode,
+    BaseCircularLinkedNode,
+    BaseSinglyLinkedNode,
+)
 
 
-class LinkedNode(BaseLinearLinkedNode):
+class LinkedNode(BaseLinearLinkedNode, BaseSinglyLinkedNode):
     next: Optional[LinkedNode]
 
     @classmethod
@@ -82,7 +87,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         return self.last.reverse()
 
 
-class CircularLinkedNode(BaseCircularLinkedNode):
+class CircularLinkedNode(BaseCircularLinkedNode, BaseSinglyLinkedNode):
     next: CircularLinkedNode
 
     @classmethod

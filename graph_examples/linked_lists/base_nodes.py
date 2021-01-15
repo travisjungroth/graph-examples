@@ -64,6 +64,10 @@ class BaseLinkedNode(ABC, Collection):
         """
 
 
+class BaseSinglyLinkedNode(BaseLinkedNode, ABC):
+    pass
+
+
 class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
     """The Abstract Base Class for all doubly linked nodes in linked lists.
 
