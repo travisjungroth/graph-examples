@@ -9,7 +9,7 @@ from graph_examples.linked_lists.base_nodes import (
 )
 
 
-class LinkedNode(BaseLinearLinkedNode, BaseSinglyLinkedNode):
+class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
     next: Optional[LinkedNode]
 
     @classmethod
@@ -87,7 +87,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         return self.last.reverse()
 
 
-class CircularLinkedNode(BaseCircularLinkedNode, BaseSinglyLinkedNode):
+class CircularLinkedNode(BaseSinglyLinkedNode, BaseCircularLinkedNode):
     next: CircularLinkedNode
 
     @classmethod
