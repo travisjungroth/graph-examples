@@ -29,6 +29,16 @@ class BaseLinkedNode(ABC, Collection):
         pass
 
 
+class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
+    @abstractmethod
+    def pop(self):
+        pass
+
+    @abstractmethod
+    def append(self, value):
+        pass
+
+
 class BaseLinearLinkedNode(BaseLinkedNode, ABC):
     def __init__(self, value, next_: Optional[BaseLinearLinkedNode] = None):
         self.value = value
@@ -48,16 +58,6 @@ class BaseLinearLinkedNode(BaseLinkedNode, ABC):
         if value == self.value:
             return True
         return self.next is not None and value in self.next
-
-
-class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
-    @abstractmethod
-    def pop(self):
-        pass
-
-    @abstractmethod
-    def append(self, value):
-        pass
 
 
 class BaseCircularLinkedNode(BaseLinkedNode, ABC):
