@@ -146,7 +146,7 @@ class BaseLinearLinkedNode(BaseLinkedNode, ABC):
 class BaseCircularLinkedNode(BaseLinkedNode, ABC):
     """The Abstract Base Class for all circular linked nodes in linked lists.
 
-    Args:
+    Attributes:
         value: The value that occupies this position in the list.
         next: The next node in the list. This is no longer optional. If nothing is provided, defaults to self.
     """
