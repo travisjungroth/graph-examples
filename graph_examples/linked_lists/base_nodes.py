@@ -1,9 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Collection, Optional, Iterable, Iterator, Reversible
+from typing import Collection, Optional, Iterable, Iterator, Reversible, TypeVar, Generic, Tuple
+
+T = TypeVar('T')
 
 
-class BaseLinkedNode(ABC, Collection):
+class BaseLinkedNode(ABC, Collection[T], Generic[T]):
     """The Abstract Base Class for all nodes in linked lists.
 
     BaseLinkedNodes will favor recursion over iteration in their methods.
@@ -15,7 +17,7 @@ class BaseLinkedNode(ABC, Collection):
         next: The next node in the list. None indicates no node.
     """
 
-    def __init__(self, value: object, next_: Optional[BaseLinkedNode] = None):
+    def __init__(self, value: T, next_: Optional[BaseLinkedNode] = None) -> None:
         self.value = value
         self.next = next_
 
@@ -25,7 +27,7 @@ class BaseLinkedNode(ABC, Collection):
 
     @classmethod
     @abstractmethod
-    def from_iterable(cls, values: Iterable) -> Optional[BaseLinkedNode]:
+    def from_iterable(cls, values: Iterable[T]) -> Optional[BaseLinkedNode[T]]:
         """Recursively create a new list of nodes.
 
         Args:
@@ -36,7 +38,7 @@ class BaseLinkedNode(ABC, Collection):
         """
 
     @abstractmethod
-    def appendleft(self, value: object) -> BaseLinkedNode:
+    def appendleft(self, value: T) -> BaseLinkedNode[T]:
         """Append to the left side of the list, which is also the 0th and head.
 
         Args:
@@ -47,7 +49,7 @@ class BaseLinkedNode(ABC, Collection):
         """
 
     @abstractmethod
-    def popleft(self) -> tuple[BaseLinkedNode, object]:
+    def popleft(self) -> tuple[BaseLinkedNode[T], T]:
         """Pop from the left side of the list, which is also the 0th and head.
 
         Returns:
@@ -55,7 +57,7 @@ class BaseLinkedNode(ABC, Collection):
         """
 
     @abstractmethod
-    def reverse(self) -> BaseLinkedNode:
+    def reverse(self) -> BaseLinkedNode[T]:
         """Recursively reverse the list.
 
         Returns:
@@ -63,13 +65,13 @@ class BaseLinkedNode(ABC, Collection):
         """
 
 
-class BaseSinglyLinkedNode(BaseLinkedNode, ABC):
+class BaseSinglyLinkedNode(BaseLinkedNode[T], ABC):
     """A list with just a next node and no last.
 
     This class has no attributes or methods over the BaseLinkedNode, but exists for inheritance clarity."""
 
 
-class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
+class BaseDoublyLinkedNode(BaseLinkedNode[T], ABC, Reversible):
     """The Abstract Base Class for all doubly linked nodes in linked lists.
 
     BaseDoublyLinkedNode introduces a "last" attribute. This allows methods on the right side of the list to be done
@@ -82,9 +84,9 @@ class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
     """
 
     def __init__(self,
-                 value: object,
+                 value: T,
                  next_: Optional[BaseDoublyLinkedNode] = None,
-                 last: Optional[BaseDoublyLinkedNode] = None):
+                 last: Optional[BaseDoublyLinkedNode] = None) -> None:
         super().__init__(value, next_)
         self.last = last
 
@@ -94,7 +96,7 @@ class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
                f'last={repr(self.last.value) if self.last is not None else "END"})'
 
     @abstractmethod
-    def pop(self):
+    def pop(self) -> Tuple[BaseDoublyLinkedNode[T], T]:
         """Pop from the right side of the list, which is also the 0th and head.
 
         Returns:
@@ -102,7 +104,7 @@ class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
         """
 
     @abstractmethod
-    def append(self, value):
+    def append(self, value: T) -> BaseDoublyLinkedNode[T]:
         """Append to the ride side of the list, which is also the -1th and tail.
 
         Args:
@@ -113,7 +115,7 @@ class BaseDoublyLinkedNode(BaseLinkedNode, ABC, Reversible):
         """
 
 
-class BaseLinearLinkedNode(BaseLinkedNode, ABC):
+class BaseLinearLinkedNode(BaseLinkedNode[T], ABC):
     """The Abstract Base Class for all linear (non-circular) linked nodes in linked lists.
 
     Any references to nodes should be optional, with None being considered terminal. Any introduced references to nodes
@@ -126,7 +128,7 @@ class BaseLinearLinkedNode(BaseLinkedNode, ABC):
             return 1
         return 1 + len(self.next)
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[T]:
         """Recursively iterate through the nodes.
 
         Yields:
@@ -136,23 +138,23 @@ class BaseLinearLinkedNode(BaseLinkedNode, ABC):
         if self.next is not None:
             yield from self.next
 
-    def __contains__(self, value: object) -> bool:
+    def __contains__(self, value: T) -> bool:
         """Recursively search for the value on this node and the ones after in O(n) time."""
         if value == self.value:
             return True
         return self.next is not None and value in self.next
 
 
-class BaseCircularLinkedNode(BaseLinkedNode, ABC):
+class BaseCircularLinkedNode(BaseLinkedNode[T], ABC):
     """The Abstract Base Class for all circular linked nodes in linked lists.
 
     Attributes:
         value: The value that occupies this position in the list.
         next: The next node in the list. This is no longer optional. If nothing is provided, defaults to self.
     """
-    next: BaseCircularLinkedNode
+    next: BaseCircularLinkedNode[T]
 
-    def __init__(self, value: object, next_: Optional[BaseCircularLinkedNode] = None):
+    def __init__(self, value: T, next_: Optional[BaseCircularLinkedNode] = None):
         next_ = next_ if next_ is not None else self
         super().__init__(value, next_)
 
@@ -162,7 +164,7 @@ class BaseCircularLinkedNode(BaseLinkedNode, ABC):
             return 0
         return 1 + self.next.__len__(self if tail is None else tail)
 
-    def __iter__(self, tail: Optional[BaseCircularLinkedNode] = None) -> Iterator:
+    def __iter__(self, tail: Optional[BaseCircularLinkedNode] = None) -> Iterator[T]:
         """Recursively iterate through the nodes.
 
         Yields:
@@ -173,7 +175,7 @@ class BaseCircularLinkedNode(BaseLinkedNode, ABC):
         yield self.next.value
         yield from self.next.__iter__(self if tail is None else tail)
 
-    def __contains__(self, value, tail: Optional[BaseCircularLinkedNode] = None) -> bool:
+    def __contains__(self, value: T, tail: Optional[BaseCircularLinkedNode] = None) -> bool:
         """Recursively search for the value on this node and the ones after in O(n) time."""
         if self is tail:
             return False

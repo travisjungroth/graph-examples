@@ -9,10 +9,11 @@ from graph_examples.linked_lists.base_lists import (
     BaseSinglyLinkedList,
 )
 from graph_examples.linked_lists.nodes import LinkedNode, DoublyLinkedNode, CircularLinkedNode, CircularDoublyLinkedNode
+from graph_examples.linked_lists.base_nodes import T
 
 
-class LinkedList(BaseLinearLinkedList, BaseSinglyLinkedList):
-    def __init__(self, values: Iterable = ()):
+class LinkedList(BaseLinearLinkedList[T], BaseSinglyLinkedList[T]):
+    def __init__(self, values: Iterable[T] = ()) -> None:
         values_iter = iter(values)
         try:
             self.head = LinkedNode(next(values_iter))
@@ -23,17 +24,17 @@ class LinkedList(BaseLinearLinkedList, BaseSinglyLinkedList):
             node.next = LinkedNode(value)
             node = node.next
 
-    def appendleft(self, value):
+    def appendleft(self, value: T) -> None:
         self.head = LinkedNode(value, self.head)
 
-    def popleft(self):
+    def popleft(self) -> T:
         if not self:
             raise IndexError
         node = self.head
         self.head = node.next
         return node.value
 
-    def reverse(self):
+    def reverse(self) -> None:
         node = self.head
         last_node = None
         while node is not None:
@@ -41,8 +42,8 @@ class LinkedList(BaseLinearLinkedList, BaseSinglyLinkedList):
         self.head = last_node
 
 
-class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
-    def __init__(self, values: Iterable = ()):
+class DoublyLinkedList(BaseLinearLinkedList[T], BaseDoublyLinkedList[T]):
+    def __init__(self, values: Iterable = ()) -> None:
         values_iter = iter(values)
         try:
             self.head = DoublyLinkedNode(next(values_iter))
@@ -54,13 +55,13 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
             node = node.next
         self.tail = node
 
-    def __reversed__(self) -> Iterator:
+    def __reversed__(self) -> Iterator[T]:
         node = self.tail
         while node is not None:
             yield node.value
             node = node.last
 
-    def append(self, value):
+    def append(self, value: T):
         old_tail = self.tail
         self.tail = DoublyLinkedNode(value, None, old_tail)
         if old_tail is None:
@@ -68,7 +69,7 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
         else:
             old_tail.next = self.tail
 
-    def appendleft(self, value):
+    def appendleft(self, value: T):
         old_head = self.head
         self.head = DoublyLinkedNode(value, old_head)
         if old_head is None:
@@ -76,7 +77,7 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
         else:
             old_head.last = self.head
 
-    def pop(self):
+    def pop(self) -> T:
         if not self:
             raise IndexError
         old_tail = self.tail
@@ -87,7 +88,7 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
             self.tail.next = None
         return old_tail.value
 
-    def popleft(self):
+    def popleft(self) -> T:
         if not self:
             raise IndexError
         old_head = self.head
@@ -98,15 +99,15 @@ class DoublyLinkedList(BaseLinearLinkedList, BaseDoublyLinkedList):
             self.head.last = None
         return old_head.value
 
-    def reverse(self):
+    def reverse(self) -> None:
         node = self.head
         self.head, self.tail = self.tail, self.head
         while node is not None:
             node.next, node.last, node = node.last, node.next, node.next
 
 
-class CircularLinkedList(BaseCircularLinkedList, BaseSinglyLinkedList):
-    def __init__(self, values: Iterable = ()):
+class CircularLinkedList(BaseCircularLinkedList[T], BaseSinglyLinkedList[T]):
+    def __init__(self, values: Iterable[T] = ()):
         values_iter = iter(values)
         try:
             head = CircularLinkedNode(next(values_iter))
@@ -119,20 +120,20 @@ class CircularLinkedList(BaseCircularLinkedList, BaseSinglyLinkedList):
         self.tail = node
 
     @property
-    def head(self) -> CircularLinkedNode:
+    def head(self) -> CircularLinkedNode[T]:
         return self.tail.next
 
     @head.setter
-    def head(self, node: CircularLinkedNode):
+    def head(self, node: CircularLinkedNode[T]):
         self.tail.next = node
 
-    def appendleft(self, value):
+    def appendleft(self, value: T) -> None:
         if not self:
             self.tail = CircularLinkedNode(value)
         else:
             self.head = CircularLinkedNode(value, self.head)
 
-    def reverse(self):
+    def reverse(self) -> None:
         if not self:
             return
         node = self.head
@@ -142,11 +143,11 @@ class CircularLinkedList(BaseCircularLinkedList, BaseSinglyLinkedList):
         self.tail.next, self.tail = last_node, self.head
 
 
-class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
-    tail: Optional[CircularDoublyLinkedNode]
-    head: Optional[CircularDoublyLinkedNode]
+class CircularDoublyLinkedList(BaseCircularLinkedList[T], BaseDoublyLinkedList[T]):
+    tail: Optional[CircularDoublyLinkedNode[T]]
+    head: Optional[CircularDoublyLinkedNode[T]]
 
-    def __init__(self, values: Iterable = ()):
+    def __init__(self, values: Iterable[T] = ()) -> None:
         values_iter = iter(values)
         try:
             head = CircularDoublyLinkedNode(next(values_iter))
@@ -160,10 +161,10 @@ class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
         self.tail = node
 
     @property
-    def head(self) -> CircularDoublyLinkedNode:
+    def head(self) -> CircularDoublyLinkedNode[T]:
         return self.tail.next
 
-    def __reversed__(self) -> Iterator:
+    def __reversed__(self) -> Iterator[T]:
         if not self:
             return
         yield self.tail.value
@@ -172,7 +173,7 @@ class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
             yield node.value
             node = node.last
 
-    def append(self, value):
+    def append(self, value: T) -> None:
         if not self:
             self.tail = CircularDoublyLinkedNode(value)
         else:
@@ -180,14 +181,14 @@ class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
             self.tail.last.next = self.tail
             self.head.last = self.tail
 
-    def appendleft(self, value):
+    def appendleft(self, value: T) -> None:
         if not self:
             self.tail = CircularDoublyLinkedNode(value)
         else:
             self.tail.next = CircularDoublyLinkedNode(value, self.head, self.tail)
             self.head.next.last = self.tail.next
 
-    def pop(self):
+    def pop(self) -> T:
         if not self:
             raise IndexError
         value = self.tail.value
@@ -197,7 +198,7 @@ class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
             self.tail.last.next, self.head.last, self.tail = self.head, self.tail.last, self.tail.last
         return value
 
-    def popleft(self):
+    def popleft(self) -> T:
         if not self:
             raise IndexError
         value = self.head.value
@@ -208,7 +209,7 @@ class CircularDoublyLinkedList(BaseCircularLinkedList, BaseDoublyLinkedList):
             self.tail.next.last = self.tail
         return value
 
-    def reverse(self):
+    def reverse(self) -> None:
         if not self:
             return
         node = self.head

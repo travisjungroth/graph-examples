@@ -3,49 +3,49 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Collection, Iterable, Reversible, Optional, Iterator
 
-from graph_examples.linked_lists.base_nodes import BaseLinearLinkedNode, BaseCircularLinkedNode
+from graph_examples.linked_lists.base_nodes import BaseLinearLinkedNode, BaseCircularLinkedNode, T
 
 
-class BaseLinkedList(ABC, Collection):
+class BaseLinkedList(ABC, Collection[T]):
     # noinspection PyUnusedLocal
     @abstractmethod
-    def __init__(self, values: Iterable = ()):
+    def __init__(self, values: Iterable[T] = ()) -> None:
         pass
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({repr([x for x in self])})'
 
     @abstractmethod
-    def appendleft(self, value):
+    def appendleft(self, value: T) -> None:
         pass
 
     @abstractmethod
-    def popleft(self):
+    def popleft(self) -> T:
         pass
 
     @abstractmethod
-    def reverse(self):
+    def reverse(self) -> None:
         pass
 
 
-class BaseSinglyLinkedList(BaseLinkedList, ABC):
+class BaseSinglyLinkedList(BaseLinkedList[T], ABC):
     pass
 
 
-class BaseDoublyLinkedList(BaseLinkedList, ABC, Reversible):
+class BaseDoublyLinkedList(BaseLinkedList[T], ABC, Reversible):
     @abstractmethod
-    def pop(self):
+    def pop(self) -> T:
         pass
 
     @abstractmethod
-    def append(self, value):
+    def append(self, value: T) -> None:
         pass
 
 
 class BaseLinearLinkedList(BaseLinkedList, ABC):
-    head: Optional[BaseLinearLinkedNode]
+    head: Optional[BaseLinearLinkedNode[T]]
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.head is not None
 
     def __len__(self) -> int:
@@ -56,13 +56,13 @@ class BaseLinearLinkedList(BaseLinkedList, ABC):
             length += 1
         return length
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[T]:
         node = self.head
         while node is not None:
             yield node.value
             node = node.next
 
-    def __contains__(self, value) -> bool:
+    def __contains__(self, value: T) -> bool:
         node = self.head
         while node is not None:
             if node.value == value:
@@ -71,11 +71,11 @@ class BaseLinearLinkedList(BaseLinkedList, ABC):
         return False
 
 
-class BaseCircularLinkedList(BaseLinkedList, ABC):
-    tail: Optional[BaseCircularLinkedNode]
-    head: Optional[BaseCircularLinkedNode]
+class BaseCircularLinkedList(BaseLinkedList[T], ABC):
+    tail: Optional[BaseCircularLinkedNode[T]]
+    head: Optional[BaseCircularLinkedNode[T]]
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self.tail is not None
 
     def __len__(self) -> int:
@@ -88,7 +88,7 @@ class BaseCircularLinkedList(BaseLinkedList, ABC):
             node = node.next
         return length
 
-    def __iter__(self) -> Iterator:
+    def __iter__(self) -> Iterator[T]:
         if not self:
             return
         head = self.head
@@ -106,7 +106,7 @@ class BaseCircularLinkedList(BaseLinkedList, ABC):
             yield node.value
             node = node.next
 
-    def __contains__(self, value: object) -> bool:
+    def __contains__(self, value: T) -> bool:
         if not self:
             return False
         node = self.head
@@ -116,7 +116,7 @@ class BaseCircularLinkedList(BaseLinkedList, ABC):
             node = node.next
         return self.tail.value == value
 
-    def popleft(self):
+    def popleft(self) -> T:
         if not self:
             raise IndexError
         value = self.head.value

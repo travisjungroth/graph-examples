@@ -4,22 +4,23 @@ The naming convention for these classes is that singly and linear linked is the 
 name. While this is less precise, it matches the convention."""
 
 from __future__ import annotations
-from typing import Optional, Iterable, Iterator
+from typing import Optional, Iterable, Iterator, TypeVar, Type
 
 from graph_examples.linked_lists.base_nodes import (
     BaseLinearLinkedNode,
     BaseDoublyLinkedNode,
     BaseCircularLinkedNode,
     BaseSinglyLinkedNode,
+    T,
 )
 
 
-class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
+class LinkedNode(BaseSinglyLinkedNode[T], BaseLinearLinkedNode[T]):
     """The most basic node on a linked list."""
-    next: Optional[LinkedNode]
+    next: Optional[LinkedNode[T]]
 
     @classmethod
-    def from_iterable(cls, values: Iterable) -> Optional[LinkedNode]:
+    def from_iterable(cls: Type[LinkedNode], values: Iterable[T]) -> LinkedNode[T]:
         """Recursively create a new list of nodes.
 
         Args:
@@ -36,7 +37,7 @@ class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
         node.next = cls.from_iterable(values_iter)
         return node
 
-    def appendleft(self, value) -> LinkedNode:
+    def appendleft(self, value) -> LinkedNode[T]:
         """Append to the left side of the list, which is also the 0th and head.
 
         Args:
@@ -47,7 +48,7 @@ class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
         """
         return LinkedNode(value, self)
 
-    def popleft(self) -> tuple[LinkedNode, object]:
+    def popleft(self) -> tuple[LinkedNode[T], T]:
         """Pop from the left side of the list, which is also the 0th and head.
 
         Returns:
@@ -55,7 +56,7 @@ class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
         """
         return self.next, self.value
 
-    def reverse(self, last_node: Optional[LinkedNode] = None) -> LinkedNode:
+    def reverse(self, last_node: Optional[LinkedNode[T]] = None) -> LinkedNode[T]:
         """Recursively reverse the list.
 
         Returns:
@@ -68,18 +69,18 @@ class LinkedNode(BaseSinglyLinkedNode, BaseLinearLinkedNode):
         return next_node.reverse(self)
 
 
-class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
+class DoublyLinkedNode(BaseDoublyLinkedNode[T], BaseLinearLinkedNode[T]):
     """A node on a doubly linear linked list.
 
     When working with this class, it is useful to hold onto both the head and tail nodes.
     Left side operations (appendleft, popleft, __iter__, reverse) are done from the head.
     Right side operations (append, pop, __reversed__) are done from the tail.
     """
-    next: Optional[DoublyLinkedNode]
-    last: Optional[DoublyLinkedNode]
+    next: Optional[DoublyLinkedNode[T]]
+    last: Optional[DoublyLinkedNode[T]]
 
     @classmethod
-    def from_iterable(cls, values: Iterable, last: Optional[DoublyLinkedNode] = None) -> Optional[DoublyLinkedNode]:
+    def from_iterable(cls, values: Iterable[T], last: Optional[DoublyLinkedNode] = None) -> Optional[DoublyLinkedNode[T]]:
         """Recursively create a new list of nodes.
 
         Args:
@@ -98,7 +99,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         return node
 
     @property
-    def tail(self) -> DoublyLinkedNode:
+    def tail(self) -> DoublyLinkedNode[T]:
         """Grab the tail from the current node. O(n). Useful for doing tail-side operations.
 
         Returns:
@@ -108,7 +109,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
             return self
         return self.next.tail
 
-    def __reversed__(self) -> Iterator:
+    def __reversed__(self) -> Iterator[T]:
         """Yields:
             The values from this node to the head, backwards.
         """
@@ -116,7 +117,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         if self.last is not None:
             yield from reversed(self.last)
 
-    def append(self, value) -> DoublyLinkedNode:
+    def append(self, value: T) -> DoublyLinkedNode[T]:
         """This should be called from the tail and appends to the ride side of the list.
 
         Args:
@@ -128,7 +129,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         self.next = DoublyLinkedNode(value, None, self)
         return self.next
 
-    def appendleft(self, value) -> DoublyLinkedNode:
+    def appendleft(self, value: T) -> DoublyLinkedNode[T]:
         """This should be called from the head and appends to the left side of the list.
 
         Args:
@@ -140,7 +141,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         self.last = DoublyLinkedNode(value, self)
         return self.last
 
-    def pop(self) -> tuple[DoublyLinkedNode, object]:
+    def pop(self) -> tuple[DoublyLinkedNode[T], T]:
         """This should be called from the tail and pops from the right side of the list.
 
         Returns:
@@ -150,7 +151,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
             self.last.next = None
         return self.last, self.value
 
-    def popleft(self) -> tuple[DoublyLinkedNode, object]:
+    def popleft(self) -> tuple[DoublyLinkedNode[T], T]:
         """This should be called from the head and pops from the left side of the list.
 
         Returns:
@@ -160,7 +161,7 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
             self.next.last = None
         return self.next, self.value
 
-    def reverse(self) -> DoublyLinkedNode:
+    def reverse(self) -> DoublyLinkedNode[T]:
         """Recursively reverse the list. Call from the head.
 
         Returns:
@@ -172,11 +173,11 @@ class DoublyLinkedNode(BaseDoublyLinkedNode, BaseLinearLinkedNode):
         return self.last.reverse()
 
 
-class CircularLinkedNode(BaseSinglyLinkedNode, BaseCircularLinkedNode):
-    next: CircularLinkedNode
+class CircularLinkedNode(BaseSinglyLinkedNode[T], BaseCircularLinkedNode[T]):
+    next: CircularLinkedNode[T]
 
     @classmethod
-    def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularLinkedNode]:
+    def from_iterable(cls, values: Iterable[T], head=None, last_node=None) -> Optional[CircularLinkedNode[T]]:
         values_iter = iter(values)
         try:
             node = cls(next(values_iter), head)
@@ -186,11 +187,11 @@ class CircularLinkedNode(BaseSinglyLinkedNode, BaseCircularLinkedNode):
         except StopIteration:
             return last_node
 
-    def appendleft(self, value) -> CircularLinkedNode:
+    def appendleft(self, value: T) -> CircularLinkedNode[T]:
         self.next = CircularLinkedNode(value, self.next)
         return self
 
-    def popleft(self) -> tuple[CircularLinkedNode, object]:
+    def popleft(self) -> tuple[CircularLinkedNode[T], T]:
         value = self.next.value
         if self is self.next:
             return None, value
@@ -199,7 +200,7 @@ class CircularLinkedNode(BaseSinglyLinkedNode, BaseCircularLinkedNode):
             return self, value
 
     def reverse(self, last_node: Optional[CircularLinkedNode] = None,
-                tail: Optional[CircularLinkedNode] = None) -> CircularLinkedNode:
+                tail: Optional[CircularLinkedNode] = None) -> CircularLinkedNode[T]:
         next_node = self.next
         self.next = last_node
         if next_node is None:
@@ -207,22 +208,22 @@ class CircularLinkedNode(BaseSinglyLinkedNode, BaseCircularLinkedNode):
         return next_node.reverse(self, next_node if tail is None else tail)
 
 
-class CircularDoublyLinkedNode(BaseDoublyLinkedNode, BaseCircularLinkedNode):
-    next: CircularDoublyLinkedNode
-    last: CircularDoublyLinkedNode
+class CircularDoublyLinkedNode(BaseDoublyLinkedNode[T], BaseCircularLinkedNode[T]):
+    next: CircularDoublyLinkedNode[T]
+    last: CircularDoublyLinkedNode[T]
 
     def __init__(
             self,
             value,
             next_: Optional[CircularDoublyLinkedNode] = None,
             last: Optional[CircularDoublyLinkedNode] = None
-    ):
+    ) -> None:
         next_ = next_ if next is not None else self
         last = last if last is not None else self
         super().__init__(value, next_, last)
 
     @classmethod
-    def from_iterable(cls, values: Iterable, head=None, last_node=None) -> Optional[CircularDoublyLinkedNode]:
+    def from_iterable(cls, values: Iterable[T], head=None, last_node=None) -> Optional[CircularDoublyLinkedNode[T]]:
         values_iter = iter(values)
         try:
             node = cls(next(values_iter), head, last_node)
@@ -243,17 +244,17 @@ class CircularDoublyLinkedNode(BaseDoublyLinkedNode, BaseCircularLinkedNode):
         yield self.value
         yield from self.last.__reversed__(self if tail is None else tail)
 
-    def append(self, value) -> CircularDoublyLinkedNode:
+    def append(self, value: T) -> CircularDoublyLinkedNode[T]:
         self.next = CircularDoublyLinkedNode(value, self.next, self)
         self.next.next.last = self.next
         return self.next
 
-    def appendleft(self, value) -> CircularDoublyLinkedNode:
+    def appendleft(self, value: T) -> CircularDoublyLinkedNode[T]:
         self.next = CircularDoublyLinkedNode(value, self.next, self)
         self.next.next.last = self.next
         return self
 
-    def pop(self) -> tuple[CircularDoublyLinkedNode, object]:
+    def pop(self) -> tuple[CircularDoublyLinkedNode[T], T]:
         value = self.value
         if self is self.next:
             return None, value
@@ -262,7 +263,7 @@ class CircularDoublyLinkedNode(BaseDoublyLinkedNode, BaseCircularLinkedNode):
             self.next.last = self.last
             return self.last, value
 
-    def popleft(self) -> tuple[CircularDoublyLinkedNode, object]:
+    def popleft(self) -> tuple[CircularDoublyLinkedNode[T], T]:
         value = self.next.value
         if self is self.next:
             return None, value
