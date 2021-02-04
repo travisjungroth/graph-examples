@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Iterable, Iterator, Optional
+from collections.abc import Iterable, Iterator
+from typing import Optional
 
 from graph_examples.linked_lists.base_lists import (
     BaseCircularLinkedList,

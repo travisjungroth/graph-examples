@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Collection, Iterable, Reversible, Optional, Iterator
+from collections.abc import Collection, Iterable, Reversible, Iterator
+from typing import Optional
 
 from graph_examples.linked_lists.base_nodes import BaseLinearLinkedNode, BaseCircularLinkedNode, T
 

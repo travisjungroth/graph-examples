@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Collection, Optional, Iterable, Iterator, Reversible, TypeVar, Generic, Tuple
+from collections.abc import Collection, Iterable, Iterator, Reversible
+from typing import Optional, TypeVar, Generic
 
 T = TypeVar('T')
 
@@ -96,7 +97,7 @@ class BaseDoublyLinkedNode(BaseLinkedNode[T], ABC, Reversible):
                f'last={repr(self.last.value) if self.last is not None else "END"})'
 
     @abstractmethod
-    def pop(self) -> Tuple[BaseDoublyLinkedNode[T], T]:
+    def pop(self) -> tuple[BaseDoublyLinkedNode[T], T]:
         """Pop from the right side of the list, which is also the 0th and head.
 
         Returns:

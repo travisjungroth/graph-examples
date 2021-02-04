@@ -4,7 +4,8 @@ The naming convention for these classes is that singly and linear linked is the 
 name. While this is less precise, it matches the convention."""
 
 from __future__ import annotations
-from typing import Optional, Iterable, Iterator, TypeVar, Type
+from collections.abc import Iterable, Iterator
+from typing import Optional, Type, TypeVar
 
 from graph_examples.linked_lists.base_nodes import (
     BaseLinearLinkedNode,
